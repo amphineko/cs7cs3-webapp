@@ -10,8 +10,10 @@ export interface IJourneyParticipant {
 
 export interface IJourneyGroup {
     id: string
-    owner: IJourneyParticipant
     type: JourneyType
+
+    host: IJourneyParticipant
+    guests: IJourneyParticipant[]
 
     destination: DestinationSearchEntry
     origin: DestinationSearchEntry

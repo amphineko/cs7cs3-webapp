@@ -1,7 +1,8 @@
 import { faker } from '@faker-js/faker'
 import { NextApiHandler } from 'next'
-import { IJourneyGroup } from '../../../../libs/api/groups'
+import { IJourneyGroup, IJourneyParticipant } from '../../../../libs/api/groups'
 import { DestinationSearchEntryType } from '../../../../libs/api/maps'
+import { put as putCache } from '../../../../libs/server/details/cache'
 import { queryReverse } from '../../../../libs/server/mapbox/serverSide'
 
 const handler: NextApiHandler = async (req, res) => {
@@ -49,11 +50,17 @@ const handler: NextApiHandler = async (req, res) => {
             id: faker.datatype.uuid(),
             type: faker.random.arrayElement(['walk', 'bus', 'taxi']),
 
-            owner: {
+            host: {
                 avatarUrl: faker.internet.avatar(),
                 id: faker.datatype.uuid(),
                 screenName: `${faker.name.firstName()} ${faker.name.lastName()}`,
             },
+
+            guests: Array.from({ length: Math.floor(Math.random() * 5) }).map<IJourneyParticipant>(() => ({
+                avatarUrl: faker.internet.avatar(),
+                id: faker.datatype.uuid(),
+                screenName: `${faker.name.firstName()} ${faker.name.lastName()}`,
+            })),
 
             origin: {
                 displayName: origin.text,
@@ -72,6 +79,8 @@ const handler: NextApiHandler = async (req, res) => {
             },
         }
     })
+
+    data.forEach((group) => putCache(group.id, group))
 
     res.status(200).json({
         code: 200,

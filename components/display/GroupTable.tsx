@@ -1,6 +1,7 @@
 import { DirectionsBus, DirectionsWalk, GpsFixed, LocalTaxi, PinDrop, QuestionMark } from '@mui/icons-material'
-import { Avatar, Grid, Paper, Typography } from '@mui/material'
+import { Avatar, AvatarGroup, Button, Card, CardActions, Grid, Typography } from '@mui/material'
 import { Box } from '@mui/system'
+import NextLink from 'next/link'
 import { IJourneyGroup, JourneyType } from '../../libs/api/groups'
 
 const JourneyIconMap: Record<JourneyType, JSX.Element> = {
@@ -11,7 +12,7 @@ const JourneyIconMap: Record<JourneyType, JSX.Element> = {
 
 export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
     return (
-        <Paper>
+        <Card>
             <Grid container direction="row" p={2}>
                 <Grid item xs={1}>
                     <Box>{JourneyIconMap[group.type] ?? <QuestionMark />}</Box>
@@ -40,16 +41,24 @@ export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
 
                         <Grid item container direction="row" alignItems="center">
                             <Grid item px={1}>
-                                <Avatar alt={group.owner.screenName} src={group.owner.avatarUrl} />
+                                <AvatarGroup total={group.guests.length + 1}>
+                                    <Avatar alt={group.host.screenName} src={group.host.avatarUrl} />
+                                </AvatarGroup>
                             </Grid>
                             <Grid item>
-                                <Typography variant="caption">{group.owner.screenName}</Typography>
+                                <Typography variant="caption">{group.host.screenName}</Typography>
                             </Grid>
                         </Grid>
                     </Grid>
                 </Grid>
             </Grid>
-        </Paper>
+
+            <CardActions>
+                <NextLink href={`/journeys/${group.id}`}>
+                    <Button size="small">Details</Button>
+                </NextLink>
+            </CardActions>
+        </Card>
     )
 }
 
