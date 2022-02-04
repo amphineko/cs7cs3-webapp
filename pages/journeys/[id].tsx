@@ -111,25 +111,28 @@ const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) =
     )
 }
 
-JourneyDetailPage.getInitialProps = ({ query: { id } }: { query: { id: string } }): JourneyDetailPageProps => {
+export default JourneyDetailPage
+
+export const getServerSideProps = async ({
+    query: { id },
+}: {
+    query: { id: string }
+}): Promise<{ props: JourneyDetailPageProps }> => {
     if (!id || !validateUuid(id)) {
         return {
-            error: 'Missing or invalid journey id',
+            props: {
+                error: 'Missing or invalid journey id',
+            },
         }
     }
 
-    const group = getCache(id)
-    if (!group) {
-        return {
-            error: `Journey ${id} not found`,
-            id,
-        }
-    }
-
+    const result = await getCache(id)
     return {
-        group,
-        id,
+        props: result
+            ? { group: result }
+            : {
+                  error: 'Not found',
+                  id,
+              },
     }
 }
-
-export default JourneyDetailPage

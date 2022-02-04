@@ -2,7 +2,7 @@ import { NextApiHandler } from 'next'
 import { validate as validateUuid } from 'uuid'
 import { get } from '../../../../libs/server/details/cache'
 
-const handler: NextApiHandler = (req, res) => {
+const handler: NextApiHandler = async (req, res) => {
     if (req.method !== 'GET') {
         res.status(405).json({
             code: 405,
@@ -20,7 +20,7 @@ const handler: NextApiHandler = (req, res) => {
         })
     }
 
-    const result = get(id)
+    const result = await get(id)
 
     const status = result ? 200 : 404
     res.status(status).json({

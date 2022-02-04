@@ -80,7 +80,7 @@ const handler: NextApiHandler = async (req, res) => {
         }
     })
 
-    data.forEach((group) => putCache(group.id, group))
+    await Promise.all(data.map((group) => putCache(group.id, group)))
 
     res.status(200).json({
         code: 200,
