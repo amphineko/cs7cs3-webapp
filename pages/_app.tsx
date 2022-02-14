@@ -80,7 +80,7 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: En
                                 </Toolbar>
                             </AppBar>
 
-                            <Container>
+                            <Container maxWidth="md">
                                 <Component {...pageProps} />
                             </Container>
                         </ThemeProvider>
