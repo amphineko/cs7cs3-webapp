@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 import { DestinationSearchEntry } from '../../api/maps'
 import { UserLocation } from '../../server/mapbox'
 
-export const useAddressQuery = (query: string, location?: UserLocation, enabled = true) => {
+export const useForwardQuery = (query: string, location?: UserLocation, enabled = false) => {
     return useQuery(
         ['address-forward', query],
         async () => {

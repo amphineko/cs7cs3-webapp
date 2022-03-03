@@ -1,8 +1,9 @@
 import { Autocomplete, TextField } from '@mui/material'
-import { useMemo, useState } from 'react'
+import { useEffect, useMemo, useState } from 'react'
 import { useUserLocation } from '../../contexts/userLocation'
 import { DestinationSearchEntry } from '../../libs/api/maps'
-import { useAddressQuery } from '../../libs/client/queries/useAddressQuery'
+import { useForwardQuery } from '../../libs/client/queries/useForwardQuery'
+import { useReverseQuery } from '../../libs/client/queries/useReverseQuery'
 
 interface AddressSearchOption {
     entry: DestinationSearchEntry
@@ -10,27 +11,61 @@ interface AddressSearchOption {
     label: string
 }
 
-export const AddressSearch = ({ onChange }: { onChange: (value: DestinationSearchEntry) => void }) => {
-    const [value, setValue] = useState<AddressSearchOption | ''>('')
+export const AddressSearch = ({
+    defaultToUserLocation,
+    onChange,
+}: {
+    defaultToUserLocation?: boolean
+    onChange: (value: DestinationSearchEntry) => void
+}) => {
+    const [value, setValue] = useState<AddressSearchOption | null>(null)
     const [inputValue, setInputValue] = useState('')
+    const [defaultValueApplied, setDefaultValueApplied] = useState(false)
 
-    const { position } = useUserLocation()
+    const userLocation = useUserLocation()
+    const userCoords =
+        userLocation.readystate === 'ready'
+            ? { lat: userLocation.position.coords.latitude, lng: userLocation.position.coords.longitude }
+            : undefined
 
-    const { data, isLoading } = useAddressQuery(
+    const { data, isLoading } = useForwardQuery(
         inputValue,
-        position && { lat: position.coords.latitude, lng: position.coords.longitude },
-        value !== inputValue
+        userCoords,
+        `${value?.entry.displayName} (${value?.entry.fullName})` !== inputValue
     )
+    const { data: currentAddress } = useReverseQuery(userCoords)
 
-    const options = useMemo(
-        () =>
-            data?.map<AddressSearchOption>((entry, idx) => ({
-                entry,
-                key: idx.toString(),
-                label: `${entry.displayName} (${entry.fullName})`,
-            })) ?? [],
-        [data]
-    )
+    const options = useMemo(() => {
+        const candidates: DestinationSearchEntry[] = []
+        if (defaultToUserLocation && currentAddress?.length > 0) {
+            candidates.push(currentAddress[0])
+        }
+        if (data?.length > 0) {
+            candidates.push(...data)
+        }
+
+        return candidates.map<AddressSearchOption>((entry, idx) => ({
+            entry,
+            key: idx.toString(),
+            label: `${entry.displayName} (${entry.fullName})`,
+        }))
+    }, [currentAddress, data, defaultToUserLocation])
+
+    useEffect(() => {
+        if (
+            defaultToUserLocation &&
+            !defaultValueApplied &&
+            options?.length > 0 &&
+            currentAddress?.length > 0 &&
+            options[0].entry === currentAddress[0]
+        ) {
+            setInputValue(options[0].label)
+            setValue(options[0])
+            onChange(options[0].entry)
+
+            setDefaultValueApplied(true)
+        }
+    }, [currentAddress, defaultToUserLocation, defaultValueApplied, onChange, options])
 
     return (
         <Autocomplete<AddressSearchOption, boolean, boolean, boolean>
@@ -43,8 +78,8 @@ export const AddressSearch = ({ onChange }: { onChange: (value: DestinationSearc
                     return
                 }
 
-                onChange(newValue?.entry)
                 setValue(newValue)
+                onChange(newValue?.entry)
             }}
             onInputChange={(_, newInputValue) => setInputValue(newInputValue)}
             options={options}

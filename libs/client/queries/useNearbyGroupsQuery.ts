@@ -1,24 +1,21 @@
 import { useQuery } from 'react-query'
-import { useUserLocation } from '../../../contexts/userLocation'
 import { IJourneyGroup } from '../../api/groups'
 import { UserLocation } from '../../server/mapbox'
 
-export const useNearbyGroupsQuery = (dest?: UserLocation) => {
-    const { position } = useUserLocation()
-
+export const useNearbyGroupsQuery = (destination?: UserLocation, origin?: UserLocation) => {
     return useQuery(
-        ['nearby-groups', position?.coords.latitude, position?.coords.longitude, dest?.lat, dest?.lng],
+        ['nearby-groups', origin?.lat, origin?.lng, destination?.lat, destination?.lng],
         async () => {
-            if (dest === undefined || position === undefined) {
-                console.error('useNearbyGroupsQuery: dest or position is undefined', dest, position)
+            if (destination === undefined || origin === undefined) {
                 return []
             }
 
             const url = new URL('/api/v1/groups/nearby', window.location.href)
-            url.searchParams.set('dest_lat', String(dest.lat))
-            url.searchParams.set('dest_lng', String(dest.lng))
-            url.searchParams.set('origin_lat', String(position.coords.latitude))
-            url.searchParams.set('origin_lng', String(position.coords.longitude))
+            url.searchParams.set('dest_lat', String(destination.lat))
+            url.searchParams.set('dest_lng', String(destination.lng))
+            url.searchParams.set('origin_lat', String(origin.lat))
+            url.searchParams.set('origin_lng', String(origin.lng))
+            console.log('querying for', origin)
 
             const req = await fetch(url.toString())
             if (req.ok) {
@@ -38,7 +35,7 @@ export const useNearbyGroupsQuery = (dest?: UserLocation) => {
             }
         },
         {
-            enabled: position !== undefined,
+            enabled: destination !== undefined && origin !== undefined,
             useErrorBoundary: true,
         }
     )

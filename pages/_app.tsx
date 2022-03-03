@@ -19,6 +19,7 @@ import {
     Typography,
 } from '@mui/material'
 import { AppProps } from 'next/app'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { AccessTokenProvider } from '../contexts/accessToken'
@@ -35,6 +36,7 @@ interface EnhancedAppProps extends AppProps {
 
 const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: EnhancedAppProps) => {
     const [isDrawerOpen, setDrawerOpen] = useState(false)
+    const router = useRouter()
 
     return (
         <QueryClientProvider client={queryClient}>
@@ -63,7 +65,13 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: En
                                         ModalProps={{ onBackdropClick: () => setDrawerOpen(false) }}
                                         open={isDrawerOpen}
                                     >
-                                        <ListItem button key="index">
+                                        <ListItem
+                                            button
+                                            key="index"
+                                            onClick={() => {
+                                                void router.push('/')
+                                            }}
+                                        >
                                             <ListItemIcon>
                                                 <HomeIcon />
                                             </ListItemIcon>
