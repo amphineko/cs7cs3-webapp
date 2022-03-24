@@ -32,8 +32,8 @@ const handler: NextApiHandler = async (req, res) => {
         code: 200,
         error: '',
         data: resp.features.map<DestinationSearchEntry>((feature) => ({
+            address: feature.place_name,
             displayName: feature.text,
-            fullName: feature.place_name,
             position: { lat: feature.geometry.coordinates[1], lng: feature.geometry.coordinates[0] },
             relevance: feature.relevance,
             type: feature.place_type[0] as DestinationSearchEntryType,

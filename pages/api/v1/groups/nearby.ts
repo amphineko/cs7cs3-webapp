@@ -63,16 +63,16 @@ const handler: NextApiHandler = async (req, res) => {
             })),
 
             origin: {
+                address: origin.place_name,
                 displayName: origin.text,
-                fullName: origin.place_name,
                 position: { lat: origin.geometry.coordinates[1], lng: origin.geometry.coordinates[0] },
                 relevance: origin.relevance,
                 type: origin.place_type[0] as DestinationSearchEntryType,
             },
 
             destination: {
+                address: destination.place_name,
                 displayName: destination.text,
-                fullName: destination.place_name,
                 position: { lat: origin.geometry.coordinates[1], lng: origin.geometry.coordinates[0] },
                 relevance: destination.relevance,
                 type: destination.place_type[0] as DestinationSearchEntryType,

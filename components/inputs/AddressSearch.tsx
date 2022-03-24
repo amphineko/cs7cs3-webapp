@@ -2,8 +2,8 @@ import { Autocomplete, TextField } from '@mui/material'
 import { useEffect, useMemo, useState } from 'react'
 import { useUserLocation } from '../../contexts/userLocation'
 import { DestinationSearchEntry } from '../../libs/api/maps'
-import { useForwardQuery } from '../../libs/client/queries/useForwardQuery'
-import { useReverseQuery } from '../../libs/client/queries/useReverseQuery'
+import { useGeocodingForwardQuery } from '../../libs/client/queries/geocoding/useForwardQuery'
+import { useReverseQuery } from '../../libs/client/queries/geocoding/useReverseQuery'
 
 interface AddressSearchOption {
     entry: DestinationSearchEntry
@@ -28,10 +28,10 @@ export const AddressSearch = ({
             ? { lat: userLocation.position.coords.latitude, lng: userLocation.position.coords.longitude }
             : undefined
 
-    const { data, isLoading } = useForwardQuery(
+    const { data, isLoading } = useGeocodingForwardQuery(
         inputValue,
         userCoords,
-        `${value?.entry.displayName} (${value?.entry.fullName})` !== inputValue
+        `${value?.entry.displayName} (${value?.entry.address})` !== inputValue
     )
     const { data: currentAddress } = useReverseQuery(userCoords)
 
@@ -47,7 +47,7 @@ export const AddressSearch = ({
         return candidates.map<AddressSearchOption>((entry, idx) => ({
             entry,
             key: idx.toString(),
-            label: `${entry.displayName} (${entry.fullName})`,
+            label: `${entry.displayName} (${entry.address})`,
         }))
     }, [currentAddress, data, defaultToUserLocation])
 

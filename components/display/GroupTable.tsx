@@ -25,7 +25,7 @@ export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="subtitle1">{group.origin.displayName}</Typography>
-                                <Typography variant="subtitle2">{group.origin.fullName}</Typography>
+                                <Typography variant="subtitle2">{group.origin.address}</Typography>
                             </Grid>
                         </Grid>
 
@@ -35,7 +35,7 @@ export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
                             </Grid>
                             <Grid item>
                                 <Typography variant="subtitle1">{group.destination.displayName}</Typography>
-                                <Typography variant="subtitle2">{group.destination.fullName}</Typography>
+                                <Typography variant="subtitle2">{group.destination.address}</Typography>
                             </Grid>
                         </Grid>
 
@@ -54,7 +54,7 @@ export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
             </Grid>
 
             <CardActions>
-                <NextLink href={`/journeys/${group.id}`}>
+                <NextLink href={`/journeys/${group.id}`} passHref>
                     <Button size="small">Details</Button>
                 </NextLink>
             </CardActions>

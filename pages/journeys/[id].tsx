@@ -42,7 +42,7 @@ const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) =
                             {group ? (
                                 <Grid item alignItems="center" justifyContent="center" xs={11}>
                                     <Typography variant="subtitle1">{group.origin.displayName}</Typography>
-                                    <Typography variant="subtitle2">{group.origin.fullName}</Typography>
+                                    <Typography variant="subtitle2">{group.origin.address}</Typography>
                                 </Grid>
                             ) : (
                                 <Skeleton width={240} />
@@ -60,7 +60,7 @@ const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) =
                             {group ? (
                                 <Grid item alignItems="center" justifyContent="center" xs={11}>
                                     <Typography variant="subtitle1">{group.destination.displayName}</Typography>
-                                    <Typography variant="subtitle2">{group.destination.fullName}</Typography>
+                                    <Typography variant="subtitle2">{group.destination.address}</Typography>
                                 </Grid>
                             ) : (
                                 <Skeleton width={240} />

@@ -12,8 +12,8 @@ export type DestinationSearchEntryType =
     | 'poi'
 
 export interface DestinationSearchEntry {
+    address?: string
     displayName: string
-    fullName?: string
     position: UserLocation
     relevance: number
     type: DestinationSearchEntryType
