@@ -3,8 +3,7 @@ import { Avatar, Box, Card, Divider, Grid, Skeleton, Typography } from '@mui/mat
 import React from 'react'
 import { validate as validateUuid } from 'uuid'
 import { IJourneyGroup, IJourneyParticipant } from '../../libs/api/groups'
-import { useGroupQuery } from '../../libs/client/queries/useGroupQuery'
-import { get as getCache } from '../../libs/server/details/cache'
+import { getJourneyGroup, useJourneyGroupQuery } from '../../libs/client/queries/journeys/useGroupQuery'
 
 interface JourneyDetailPageProps {
     error?: string
@@ -26,7 +25,7 @@ const UserRow = ({ user }: { user: IJourneyParticipant }) => {
 }
 
 const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) => {
-    const { data: group } = useGroupQuery(id, initialData)
+    const { data: group } = useJourneyGroupQuery(id, initialData)
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>
@@ -126,13 +125,10 @@ export const getServerSideProps = async ({
         }
     }
 
-    const result = await getCache(id)
-    return {
-        props: result
-            ? { group: result }
-            : {
-                  error: 'Not found',
-                  id,
-              },
+    try {
+        const group = await getJourneyGroup(id, process.env.IONPROPELLER_URL)
+        return { props: { group, id } }
+    } catch (error) {
+        return { props: { error: (error as Error)?.message ?? 'unknown error', id } }
     }
 }

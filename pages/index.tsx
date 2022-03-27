@@ -5,7 +5,7 @@ import { GroupTable } from '../components/display/GroupTable'
 import { AddressSearch } from '../components/inputs/AddressSearch'
 import { useUserLocation } from '../contexts/userLocation'
 import { DestinationSearchEntry } from '../libs/api/maps'
-import { useNearbyGroupsQuery } from '../libs/client/queries/useNearbyGroupsQuery'
+import { useNearbyJourneyGroupsQuery } from '../libs/client/queries/journeys/useNearbyGroupsQuery'
 
 const IndexPage = () => {
     const userLocation = useUserLocation()
@@ -13,7 +13,7 @@ const IndexPage = () => {
     const [destination, setDestination] = useState<DestinationSearchEntry>()
     const [origin, setOrigin] = useState<DestinationSearchEntry>()
 
-    const { data: nearbyGroups } = useNearbyGroupsQuery(destination?.position, origin?.position)
+    const { data: nearbyGroups } = useNearbyJourneyGroupsQuery(destination?.position, origin?.position)
 
     return (
         <Grid container alignItems="center" minHeight="100vh">
