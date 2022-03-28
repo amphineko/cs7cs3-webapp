@@ -1,9 +1,9 @@
 import { Grid, TextField, Box, Button, MenuItem } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
-import { useUesrInfoQuery } from '../../../libs/client/queries/useUserQuery'
 import { GenderType } from '../../../libs/api/userinfo'
 import useUserInfoMutation from '../../../libs/client/mutations/useUserInfoMutation'
+import { useUesrInfoQuery } from '../../../libs/client/queries/useUserQuery'
 
 const Female: GenderType = 'Female'
 const Male: GenderType = 'Male'
@@ -41,9 +41,6 @@ const UpdateUserInfo = () => {
     }
 
     const handleOnClick = () => {
-        console.log('hello')
-        console.log(username)
-        console.log(gender)
         mutate({ ...data, username, gender }, { onSettled: () => remove() })
     }
     return (

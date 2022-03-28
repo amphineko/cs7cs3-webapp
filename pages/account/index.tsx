@@ -3,7 +3,7 @@ import Grid from '@mui/material/Grid'
 import Link from 'next/link'
 import React, { useState } from 'react'
 import { useRouter } from 'next/router'
-import { useUserMutation } from '../../libs/client/mutations/useUserMutation'
+import { useUserMutation } from '../../libs/client/queries/useUserMutation'
 
 export default function Login() {
     const router = useRouter()
@@ -12,9 +12,9 @@ export default function Login() {
 
     const { data, mutate } = useUserMutation(username, password)
 
-    const handleSubmit = async () => {
+    function handleSubmit() {
         if (data !== undefined) {
-            await router.push('/')
+            void router.push('/')
         }
         if (data === undefined) {
             mutate()

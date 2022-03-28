@@ -3,6 +3,8 @@ import { CacheProvider } from '@emotion/react'
 import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
 import SettingsIcon from '@mui/icons-material/Settings'
+import NotificationsIcon from '@mui/icons-material/Notifications'
+import { useRouter } from 'next/router'
 import {
     AppBar,
     Container,
@@ -35,7 +37,7 @@ interface EnhancedAppProps extends AppProps {
 
 const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: EnhancedAppProps) => {
     const [isDrawerOpen, setDrawerOpen] = useState(false)
-
+    const router = useRouter()
     return (
         <QueryClientProvider client={queryClient}>
             <UserLocationProvider>
@@ -76,6 +78,20 @@ const App = ({ Component, emotionCache = clientSideEmotionCache, pageProps }: En
                                             </ListItemIcon>
                                             <ListItemText primary="Settings" />
                                         </ListItem>
+                                        <Divider />
+                                        <ListItem
+                                            button
+                                            key="notification"
+                                            onClick={() => {
+                                                void router.push('/notification')
+                                            }}
+                                        >
+                                            <ListItemIcon>
+                                                <NotificationsIcon />
+                                            </ListItemIcon>
+                                            <ListItemText primary="Notification" />
+                                        </ListItem>
+                                        <Divider />
                                     </Drawer>
                                 </Toolbar>
                             </AppBar>
