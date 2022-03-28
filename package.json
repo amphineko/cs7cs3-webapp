@@ -9,6 +9,7 @@
         "@mui/icons-material": "^5.4.4",
         "@mui/material": "^5.4.4",
         "ioredis": "^4.28.5",
+        "mapbox-gl": "^2.7.1",
         "next": "^12.1.0",
         "node-cache": "^5.1.2",
         "react": "^17.0.2",
