@@ -4,7 +4,7 @@ import { useEffect, useState } from 'react'
 import { AddressSearch } from '../../components/inputs/AddressSearch'
 import { useUserLocation } from '../../contexts/userLocation'
 import { DestinationSearchEntry } from '../../libs/api/maps'
-import Map, { Marker } from 'react-map-gl'
+import { Map, Marker } from 'react-map-gl'
 import { JourneyType } from '../../libs/api/groups'
 
 const AddJourney = () => {
@@ -27,7 +27,6 @@ const AddJourney = () => {
     const currentLocation = useUserLocation()
     const [lng, setLng] = useState(-6.26)
     const [lat, setLat] = useState(53.35)
-    const [zoom, setZoom] = useState(13)
     const [origin, setOrigin] = useState<DestinationSearchEntry>()
     const [destination, setDestination] = useState<DestinationSearchEntry>()
     const [method, setMethod] = useState<JourneyType>('taxi')
@@ -61,7 +60,7 @@ const AddJourney = () => {
                 <Grid item paddingTop={2}>
                     <Map
                         style={{ height: '70vh' }}
-                        initialViewState={{ longitude: lng, latitude: lat, zoom: zoom }}
+                        initialViewState={{ longitude: lng, latitude: lat, zoom: 13 }}
                         mapStyle="mapbox://styles/mapbox/streets-v11"
                         mapboxAccessToken="pk.eyJ1IjoiYW1waGluZWtvIiwiYSI6ImNrejV0dTRvZTBvdXUyb3FmdHdmbXgyaGkifQ.qSX45S404Pbr9PX9WbjuKA"
                     >
