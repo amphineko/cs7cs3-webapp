@@ -3,7 +3,6 @@ import { CacheProvider } from '@emotion/react'
 import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
 import SettingsIcon from '@mui/icons-material/Settings'
-import NotificationsIcon from '@mui/icons-material/Notifications'
 import { useRouter } from 'next/router'
 import {
     AppBar,
@@ -23,7 +22,6 @@ import {
 import 'mapbox-gl/dist/mapbox-gl.css'
 import { NextPage } from 'next'
 import { AppProps } from 'next/app'
-import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { AccessTokenProvider } from '../contexts/accessToken'
