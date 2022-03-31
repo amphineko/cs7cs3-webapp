@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query'
 import { useEndpoint } from '../../../../contexts/api'
 import { DestinationSearchEntry } from '../../../api/maps'
-import { UserLocation } from '../../../server/mapbox'
+import { LatLngLike } from '../../../server/mapbox'
 
-export const useGeocodingForwardQuery = (search: string, location?: UserLocation, enabled = false) => {
+export const useGeocodingForwardQuery = (search: string, location?: LatLngLike, enabled = false) => {
     const { endpoint } = useEndpoint()
 
     return useQuery(

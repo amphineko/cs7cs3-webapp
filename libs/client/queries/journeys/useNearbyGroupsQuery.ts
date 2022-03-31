@@ -1,9 +1,9 @@
 import { useQuery } from 'react-query'
 import { useEndpoint } from '../../../../contexts/api'
 import { IJourneyGroup } from '../../../api/groups'
-import { UserLocation } from '../../../server/mapbox'
+import { LatLngLike } from '../../../server/mapbox'
 
-export const useNearbyJourneyGroupsQuery = (destination?: UserLocation, origin?: UserLocation) => {
+export const useNearbyJourneyGroupsQuery = (destination?: LatLngLike, origin?: LatLngLike) => {
     const { endpoint } = useEndpoint()
 
     return useQuery(

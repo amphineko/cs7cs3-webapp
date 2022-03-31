@@ -5,6 +5,7 @@ import React from 'react'
 import { validate as validateUuid } from 'uuid'
 import { Map } from '../../components/display/Map'
 import { IJourneyGroup, IJourneyParticipant } from '../../libs/api/groups'
+import { useDirectionQuery } from '../../libs/client/queries/directions/useDirectionQuery'
 import { getJourneyGroup, useJourneyGroupQuery } from '../../libs/client/queries/journeys/useGroupQuery'
 
 interface ServerSideProps {
@@ -29,6 +30,8 @@ const UserRow = ({ user }: { user: IJourneyParticipant }) => {
 
 const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: initialData, id }: ServerSideProps) => {
     const { data: group } = useJourneyGroupQuery(id, initialData)
+    const { data: direction } = useDirectionQuery(group?.origin.position, group?.destination.position, group?.type)
+    console.log(direction)
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>
@@ -36,9 +39,10 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                 <Card>
                     <Map
                         accessToken={accessToken}
-                        destination={group.destination.position}
+                        destination={group?.destination.position}
+                        direction={direction}
                         maxHeight="50vh"
-                        origin={group.origin.position}
+                        origin={group?.origin.position}
                     />
                 </Card>
             </Grid>

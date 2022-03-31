@@ -1,4 +1,4 @@
-import { UserLocation } from '../server/mapbox'
+import { LatLngLike } from '../server/mapbox'
 
 export type DestinationSearchEntryType =
     | 'country'
@@ -14,7 +14,7 @@ export type DestinationSearchEntryType =
 export interface DestinationSearchEntry {
     address?: string
     displayName: string
-    position: UserLocation
+    position: LatLngLike
     relevance: number
     type: DestinationSearchEntryType
 }
