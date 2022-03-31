@@ -5,18 +5,23 @@ type UserLocationReadystate =
     | 'waiting' // waiting for user approval, or location is on the way
     | 'ready'
 
-interface IUserLocationContext {
-    error?: GeolocationPositionError
-    position?: GeolocationPosition
-    readystate: UserLocationReadystate
-    refresh: (enableHighAccuracy?: boolean) => void
-}
+type IUserLocationContext =
+    | {
+          error?: GeolocationPositionError
+          readystate: 'unavailable'
+      }
+    | {
+          error: GeolocationPositionError
+          readystate: 'waiting'
+      }
+    | {
+          position: GeolocationPosition
+          readystate: 'ready'
+          refresh: (enableHighAccuracy: boolean) => void
+      }
 
 const UserLocationContext = createContext<IUserLocationContext>({
     readystate: 'unavailable',
-    refresh: () => {
-        throw new Error('Not implemented')
-    },
 })
 
 export const UserLocationProvider = ({ children }: PropsWithChildren<unknown>) => {

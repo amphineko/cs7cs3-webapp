@@ -1,12 +1,14 @@
 import { GpsFixed, PinDrop } from '@mui/icons-material'
 import { Avatar, Box, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
+import { GetServerSideProps, NextPage } from 'next'
 import React from 'react'
 import { validate as validateUuid } from 'uuid'
+import { Map } from '../../components/display/Map'
 import { IJourneyGroup, IJourneyParticipant } from '../../libs/api/groups'
-import { useGroupQuery } from '../../libs/client/queries/useGroupQuery'
-import { get as getCache } from '../../libs/server/details/cache'
+import { getJourneyGroup, useJourneyGroupQuery } from '../../libs/client/queries/journeys/useGroupQuery'
 
-interface JourneyDetailPageProps {
+interface ServerSideProps {
+    accessToken: string
     error?: string
     group?: IJourneyGroup
     id?: string
@@ -25,11 +27,22 @@ const UserRow = ({ user }: { user: IJourneyParticipant }) => {
     )
 }
 
-const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) => {
-    const { data: group } = useGroupQuery(id, initialData)
+const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: initialData, id }: ServerSideProps) => {
+    const { data: group } = useJourneyGroupQuery(id, initialData)
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>
+            <Grid item>
+                <Card>
+                    <Map
+                        accessToken={accessToken}
+                        destination={group.destination.position}
+                        maxHeight="50vh"
+                        origin={group.origin.position}
+                    />
+                </Card>
+            </Grid>
+
             <Grid item>
                 <Card>
                     <Grid container direction="column" paddingY={2} spacing={2}>
@@ -42,7 +55,7 @@ const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) =
                             {group ? (
                                 <Grid item alignItems="center" justifyContent="center" xs={11}>
                                     <Typography variant="subtitle1">{group.origin.displayName}</Typography>
-                                    <Typography variant="subtitle2">{group.origin.fullName}</Typography>
+                                    <Typography variant="subtitle2">{group.origin.address}</Typography>
                                 </Grid>
                             ) : (
                                 <Skeleton width={240} />
@@ -60,7 +73,7 @@ const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) =
                             {group ? (
                                 <Grid item alignItems="center" justifyContent="center" xs={11}>
                                     <Typography variant="subtitle1">{group.destination.displayName}</Typography>
-                                    <Typography variant="subtitle2">{group.destination.fullName}</Typography>
+                                    <Typography variant="subtitle2">{group.destination.address}</Typography>
                                 </Grid>
                             ) : (
                                 <Skeleton width={240} />
@@ -113,26 +126,22 @@ const JourneyDetailPage = ({ group: initialData, id }: JourneyDetailPageProps) =
 
 export default JourneyDetailPage
 
-export const getServerSideProps = async ({
-    query: { id },
-}: {
-    query: { id: string }
-}): Promise<{ props: JourneyDetailPageProps }> => {
-    if (!id || !validateUuid(id)) {
+const accessToken = process.env.MAPBOX_CLIENT_TOKEN
+
+export const getServerSideProps: GetServerSideProps<ServerSideProps> = async ({ query: { id } }) => {
+    if (typeof id !== 'string' || !validateUuid(id)) {
         return {
             props: {
+                accessToken,
                 error: 'Missing or invalid journey id',
             },
         }
     }
 
-    const result = await getCache(id)
-    return {
-        props: result
-            ? { group: result }
-            : {
-                  error: 'Not found',
-                  id,
-              },
+    try {
+        const group = await getJourneyGroup(id, process.env.IONPROPELLER_URL)
+        return { props: { accessToken, group, id } }
+    } catch (error) {
+        return { props: { accessToken, error: (error as Error)?.message ?? 'unknown error', id } }
     }
 }
