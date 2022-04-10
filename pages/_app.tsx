@@ -1,5 +1,6 @@
 import createEmotionCache, { EmotionCache } from '@emotion/cache'
 import { CacheProvider } from '@emotion/react'
+import { Logout } from '@mui/icons-material'
 import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -16,8 +17,11 @@ import {
     ListItem,
     ListItemIcon,
     ListItemText,
+    Menu,
+    MenuItem,
     ThemeProvider,
     Toolbar,
+    Tooltip,
     Typography,
 } from '@mui/material'
 import 'mapbox-gl/dist/mapbox-gl.css'
@@ -25,7 +29,7 @@ import { NextPage } from 'next'
 import { AppProps } from 'next/app'
 import Link from 'next/link'
 import { useRouter } from 'next/router'
-import { useState } from 'react'
+import { MouseEventHandler, useState } from 'react'
 import { QueryClient, QueryClientProvider } from 'react-query'
 import { AccessTokenProvider, useAccessToken } from '../contexts/accessToken'
 import { EndpointProvider } from '../contexts/api'
@@ -47,11 +51,42 @@ interface AppInitialProps {
 }
 
 const UserBar = () => {
-    const { id: selfId } = useAccessToken()
+    const { clear, id: selfId } = useAccessToken()
     const { data: selfProfile } = useProfileQuery(selfId)
 
+    const [menuAnchor, setMenuAnchor] = useState<HTMLElement | null>(null)
+
+    const handleClose = () => {
+        setMenuAnchor(null)
+    }
+
+    const handleOpenClick: MouseEventHandler<HTMLElement> = (event) => {
+        setMenuAnchor(event.currentTarget)
+    }
+
     return selfProfile ? (
-        <Avatar src={selfProfile.avatar} sx={{ m: 1, bgcolor: 'secondary.main' }} />
+        <>
+            <Typography>{selfProfile.username}</Typography>{' '}
+            <Tooltip title="Account menu">
+                <IconButton
+                    aria-controls={open ? 'account-menu' : undefined}
+                    aria-expanded={open ? 'true' : undefined}
+                    aria-haspopup="true"
+                    onClick={handleOpenClick}
+                    size="small"
+                    sx={{ ml: 2 }}
+                >
+                    <Avatar src={selfProfile.avatar} sx={{ bgcolor: 'secondary.main' }} />
+                </IconButton>
+            </Tooltip>
+            <Menu anchorEl={menuAnchor} onClick={handleClose} onClose={handleClose} open={menuAnchor !== null}>
+                <MenuItem>
+                    <Button onClick={() => clear()} startIcon={<Logout />}>
+                        Logout
+                    </Button>
+                </MenuItem>
+            </Menu>
+        </>
     ) : (
         <>
             <Link href="/users/register" passHref>
