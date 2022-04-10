@@ -4,7 +4,7 @@ import { DestinationSearchEntry } from '../../../api/maps'
 import { LatLngLike } from '../../../server/mapbox'
 
 export const useReverseQuery = (location?: LatLngLike) => {
-    const { endpoint } = useEndpoint()
+    const { liftEndpoint: endpoint } = useEndpoint()
 
     return useQuery(
         ['geocoding-reverse', location?.lat, location?.lng],

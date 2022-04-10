@@ -4,7 +4,7 @@ import { DestinationSearchEntry } from '../../../api/maps'
 import { LatLngLike } from '../../../server/mapbox'
 
 export const useGeocodingForwardQuery = (search: string, location?: LatLngLike, enabled = false) => {
-    const { endpoint } = useEndpoint()
+    const { liftEndpoint: endpoint } = useEndpoint()
 
     return useQuery(
         ['geocoding-forward', search],

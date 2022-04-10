@@ -14,7 +14,7 @@ const typeMapping: { [key in JourneyType]: string } = {
 type DirectionQueryResponse = FeatureCollection
 
 export const useDirectionQuery = (origin?: LatLngLike, destination?: LatLngLike, type?: JourneyType) => {
-    const { endpoint } = useEndpoint()
+    const { liftEndpoint: endpoint } = useEndpoint()
 
     const enabled = useMemo(() => !!(origin && destination && type), [origin, destination, type])
 

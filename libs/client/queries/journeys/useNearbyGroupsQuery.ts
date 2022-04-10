@@ -4,7 +4,7 @@ import { IJourneyGroup } from '../../../api/groups'
 import { LatLngLike } from '../../../server/mapbox'
 
 export const useNearbyJourneyGroupsQuery = (destination?: LatLngLike, origin?: LatLngLike) => {
-    const { endpoint } = useEndpoint()
+    const { liftEndpoint: endpoint } = useEndpoint()
 
     return useQuery(
         ['api/v1/journeys/groups', origin?.lat, origin?.lng, destination?.lat, destination?.lng],

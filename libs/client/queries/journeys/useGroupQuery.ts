@@ -16,7 +16,7 @@ export const getJourneyGroup = async (id: string, endpoint: string) => {
 }
 
 export const useJourneyGroupQuery = (id?: string, initialData?: IJourneyGroup) => {
-    const { endpoint } = useEndpoint()
+    const { liftEndpoint: endpoint } = useEndpoint()
 
     return useQuery(
         ['api/v1/journeys/groups', id],
