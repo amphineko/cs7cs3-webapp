@@ -20,7 +20,7 @@ export const useProfileQuery = (id?: string) => {
     const { apiEndpoint: endpoint } = useEndpoint()
     const { accessToken } = useAccessToken()
 
-    return useQuery(['user-info/profile/self', accessToken], async () => {
+    return useQuery(['user-info/profile/self', id, accessToken], async () => {
         if (!accessToken || !id) {
             return undefined
         }
