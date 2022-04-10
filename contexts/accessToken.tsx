@@ -26,21 +26,28 @@ const AccessTokenContext = createContext<IAccessTokenContext>({
 })
 
 export const AccessTokenProvider = ({ children }: PropsWithChildren<unknown>) => {
-    const [accessToken, setAccessToken] = useState<string>()
-    const [id, setId] = useState<string>()
+    const [accessToken, setAccessToken] = useState<string>(
+        typeof localStorage !== 'undefined' ? localStorage.getItem('accessToken') : undefined
+    )
+    const [userId, setUserId] = useState<string>(
+        typeof localStorage !== 'undefined' ? localStorage.getItem('userId') : undefined
+    )
 
     return (
         <AccessTokenContext.Provider
             value={{
-                accessToken,
-                id,
+                accessToken: accessToken,
+                id: userId,
                 clear: () => {
                     setAccessToken(undefined)
-                    setId(undefined)
+                    setUserId(undefined)
                 },
                 update: (accessToken: string, id: string) => {
                     setAccessToken(accessToken)
-                    setId(id)
+                    setUserId(id)
+
+                    localStorage.setItem('accessToken', accessToken)
+                    localStorage.setItem('userId', id)
                 },
             }}
         >
