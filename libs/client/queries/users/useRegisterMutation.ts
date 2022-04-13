@@ -20,6 +20,10 @@ export const useRegisterMutation = () => {
 
             const req = await fetch(url.toString(), {
                 body: JSON.stringify({ username, password, publicKey: '', privateKey: '', timestamp: Date.now() }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
             })
 
             if (!req.ok) {

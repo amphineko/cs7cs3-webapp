@@ -31,7 +31,6 @@ const UserRow = ({ user }: { user: IJourneyParticipant }) => {
 const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: initialData, id }: ServerSideProps) => {
     const { data: group } = useJourneyGroupQuery(id, initialData)
     const { data: direction } = useDirectionQuery(group?.origin.position, group?.destination.position, group?.type)
-    console.log(direction)
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>

@@ -2,7 +2,7 @@ import { useQuery } from 'react-query'
 import { useAccessToken } from '../../../../contexts/accessToken'
 import { useEndpoint } from '../../../../contexts/api'
 
-interface IUserProfile {
+export interface IUserProfile {
     id: string
     username: string
 

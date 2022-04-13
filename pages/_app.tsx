@@ -1,6 +1,8 @@
 import createEmotionCache, { EmotionCache } from '@emotion/cache'
 import { CacheProvider } from '@emotion/react'
 import { Logout } from '@mui/icons-material'
+import AddRoadIcon from '@mui/icons-material/AddRoad'
+import FaceIcon from '@mui/icons-material/Face'
 import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
 import SettingsIcon from '@mui/icons-material/Settings'
@@ -80,6 +82,11 @@ const UserBar = () => {
                 </IconButton>
             </Tooltip>
             <Menu anchorEl={menuAnchor} onClick={handleClose} onClose={handleClose} open={menuAnchor !== null}>
+                <MenuItem>
+                    <Link href={`/users/${selfId}`} passHref>
+                        <Button startIcon={<FaceIcon />}>My Profile</Button>
+                    </Link>
+                </MenuItem>
                 <MenuItem>
                     <Button onClick={() => clear()} startIcon={<Logout />}>
                         Logout
