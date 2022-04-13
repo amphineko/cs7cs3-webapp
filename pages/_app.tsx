@@ -4,6 +4,7 @@ import { Logout } from '@mui/icons-material'
 import HomeIcon from '@mui/icons-material/Home'
 import MenuIcon from '@mui/icons-material/Menu'
 import SettingsIcon from '@mui/icons-material/Settings'
+import AddRoadIcon from '@mui/icons-material/AddRoad'
 import { useRouter } from 'next/router'
 import {
     AppBar,
@@ -161,6 +162,19 @@ const App: NextPage<EnhancedAppProps & AppInitialProps, AppInitialProps> = ({
                                                     <SettingsIcon />
                                                 </ListItemIcon>
                                                 <ListItemText primary="Settings" />
+                                            </ListItem>
+                                            <Divider />
+                                            <ListItem
+                                                button
+                                                key="Add Journey"
+                                                onClick={() => {
+                                                    void router.push('/journeys/add_journey')
+                                                }}
+                                            >
+                                                <ListItemIcon>
+                                                    <AddRoadIcon />
+                                                </ListItemIcon>
+                                                <ListItemText primary="Add Journey" />
                                             </ListItem>
                                         </Drawer>
                                     </Toolbar>

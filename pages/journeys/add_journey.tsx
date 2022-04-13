@@ -7,6 +7,8 @@ import { DestinationSearchEntry } from '../../libs/api/maps'
 import { Map } from '../../components/display/Map'
 import { JourneyType } from '../../libs/api/groups'
 
+const accessToken = process.env.MAPBOX_CLIENT_TOKEN
+
 const AddJourney = () => {
     const methodList = [
         {
@@ -74,7 +76,7 @@ const AddJourney = () => {
                             />
                         </Card>
                     </Grid>
-                    <Typography paddingTop={11}>
+                    <Typography paddingTop={9}>
                         <Grid container direction="row" alignItems="center">
                             <GpsFixed />
                             From
@@ -93,10 +95,11 @@ const AddJourney = () => {
                 </Grid>
 
                 <Grid item alignItems="center">
-                    <Grid container>
+                    <Grid item margin={2}>
                         <TextField
                             required
-                            label="gneder"
+                            label="method"
+                            fullWidth
                             defaultValue={method}
                             value={method}
                             onChange={handleChange}
@@ -112,8 +115,8 @@ const AddJourney = () => {
                     </Grid>
                 </Grid>
 
-                <Grid item>
-                    <Button variant="contained" onClick={() => handleOnClick()}>
+                <Grid item margin={2}>
+                    <Button fullWidth variant="contained" onClick={() => handleOnClick()}>
                         Create
                     </Button>
                 </Grid>
