@@ -1,4 +1,4 @@
-import { Grid, TextField, Box, Button, MenuItem } from '@mui/material'
+import { Grid, TextField, Box, Button, MenuItem, Container } from '@mui/material'
 import { useRouter } from 'next/router'
 import { useEffect, useState } from 'react'
 import { GenderType } from '../../../libs/api/userinfo'
@@ -44,41 +44,47 @@ const UpdateUserInfo = () => {
         mutate({ ...data, username, gender }, { onSettled: () => remove() })
     }
     return (
-        <Grid container alignItems="center">
-            <Grid container xs={13} direction="column" alignItems="center">
-                <Grid container alignItems="center" direction="row" paddingTop={2}>
-                    <TextField
-                        required
-                        label="username"
-                        defaultValue={username}
-                        value={username}
-                        onChange={(e) => setUsername(e.target.value)}
-                    />
+        <Container maxWidth="sm">
+            <Grid container alignItems="center">
+                <Grid container xs={13} direction="column" alignItems="center">
+                    <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
+                        <Grid container alignItems="center" direction="column" paddingTop={2}>
+                            <Grid item>
+                                <TextField
+                                    required
+                                    label="username"
+                                    defaultValue={username}
+                                    value={username}
+                                    onChange={(e) => setUsername(e.target.value)}
+                                />
+                            </Grid>
+                        </Grid>
+                        <Grid item alignItems="center" paddingTop={2}>
+                            <TextField
+                                required
+                                label="gneder"
+                                defaultValue={gender}
+                                value={gender}
+                                onChange={handleChange}
+                                select
+                                variant="filled"
+                            >
+                                {Gender.map((option) => (
+                                    <MenuItem key={option.value} value={option.value}>
+                                        {option.label}
+                                    </MenuItem>
+                                ))}
+                            </TextField>
+                        </Grid>
+                    </Box>
+                    <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
+                        <Button variant="contained" onClick={() => handleOnClick()}>
+                            Submit
+                        </Button>
+                    </Box>
                 </Grid>
-                <Grid container alignItems="center" paddingTop={2}>
-                    <TextField
-                        required
-                        label="gneder"
-                        defaultValue={gender}
-                        value={gender}
-                        onChange={handleChange}
-                        select
-                        variant="filled"
-                    >
-                        {Gender.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
-                </Grid>
-                <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
-                    <Button variant="contained" onClick={() => handleOnClick()}>
-                        Submit
-                    </Button>
-                </Box>
             </Grid>
-        </Grid>
+        </Container>
     )
 }
 

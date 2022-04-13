@@ -16,7 +16,7 @@ export default function Register() {
         },
     ]
     const route = useRouter()
-    function holdClickFunction() {
+    const holdClickFunction = () => {
         return route.push('/account')
     }
 
