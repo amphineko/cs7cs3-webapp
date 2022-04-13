@@ -35,7 +35,7 @@ const Navigation = () => {
                     style={{ height: '70vh' }}
                     initialViewState={{ longitude: lng, latitude: lat, zoom: 13 }}
                     mapStyle="mapbox://styles/mapbox/outdoors-v11"
-                    mapboxAccessToken="pk.eyJ1IjoiYW1waGluZWtvIiwiYSI6ImNrejV0dTRvZTBvdXUyb3FmdHdmbXgyaGkifQ.qSX45S404Pbr9PX9WbjuKA"
+                    mapboxAccessToken={process.env.MAPBOX_CLIENT_TOKEN}
                 >
                     <Marker latitude={lat} longitude={lng} />
                     <FullscreenControl position="top-right" />

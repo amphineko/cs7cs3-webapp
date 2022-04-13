@@ -89,7 +89,7 @@ const UserBar = () => {
         </>
     ) : (
         <>
-            <Link href="/users/register" passHref>
+            <Link href="/account/register" passHref>
                 <Button color="inherit" href="#" sx={{ my: 1, mx: 1.5 }}>
                     Sign Up
                 </Button>
