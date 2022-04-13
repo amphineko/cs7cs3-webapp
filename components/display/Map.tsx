@@ -1,17 +1,22 @@
+import bbox from '@turf/bbox'
+import { points as createPoints } from '@turf/helpers'
+import { BBox2d } from '@turf/helpers/dist/js/lib/geojson'
+import { Feature } from 'geojson'
 import mapboxgl from 'mapbox-gl'
 import { useEffect, useMemo, useRef, useState } from 'react'
 import { useUserLocation } from '../../contexts/userLocation'
-import { UserLocation } from '../../libs/server/mapbox'
+import { LatLngLike } from '../../libs/server/mapbox'
 
 interface MapProps {
     accessToken: string
     maxHeight?: string
 
-    destination?: UserLocation
-    origin?: UserLocation
+    destination?: LatLngLike
+    direction?: Feature
+    origin?: LatLngLike
 }
 
-export const Map = ({ accessToken, destination, maxHeight, origin }: MapProps) => {
+export const Map = ({ accessToken, destination, direction, maxHeight, origin }: MapProps) => {
     const [containerId] = useState(() => `map-container-${Math.random()}`)
     const container = useRef<HTMLDivElement>()
 
@@ -38,7 +43,6 @@ export const Map = ({ accessToken, destination, maxHeight, origin }: MapProps) =
 
             const geolocateControl = new mapboxgl.GeolocateControl({
                 showUserHeading: true,
-                trackUserLocation: true,
             })
 
             map.current.addControl(geolocateControl)
@@ -56,6 +60,27 @@ export const Map = ({ accessToken, destination, maxHeight, origin }: MapProps) =
                 const originMarker = new mapboxgl.Marker({ color: 'blue' })
                 originMarker.setLngLat(origin).addTo(map.current)
             }
+
+            // direction
+
+            if (direction) {
+                map.current.on('load', ({ target: map }) => {
+                    map.addSource('direction', { type: 'geojson', data: direction })
+                    map.addLayer({
+                        id: 'direction',
+                        type: 'line',
+                        source: 'direction',
+                        layout: {
+                            'line-cap': 'round',
+                            'line-join': 'round',
+                        },
+                        paint: {
+                            'line-color': '#f2ca36',
+                            'line-width': 8,
+                        },
+                    })
+                })
+            }
         }
 
         return () => {
@@ -63,7 +88,7 @@ export const Map = ({ accessToken, destination, maxHeight, origin }: MapProps) =
             map.current?.remove()
             map.current = undefined
         }
-    }, [accessToken, containerId, destination, origin])
+    }, [accessToken, containerId, destination, direction, origin])
 
     useEffect(() => {
         if (!map.current) {
@@ -75,15 +100,12 @@ export const Map = ({ accessToken, destination, maxHeight, origin }: MapProps) =
         }
 
         if (destination && origin && userCoords) {
-            const sw: [number, number] = [
-                [destination.lng, origin.lng, userCoords.lng].sort((a, b) => a - b)[0],
-                [destination.lat, origin.lat, userCoords.lat].sort((a, b) => a - b)[0],
-            ]
-            const ne: [number, number] = [
-                [destination.lng, origin.lng, userCoords.lng].sort((a, b) => b - a)[0],
-                [destination.lat, origin.lat, userCoords.lat].sort((a, b) => b - a)[0],
-            ]
-            map.current.fitBounds([sw, ne], { padding: 100 })
+            const points = createPoints([
+                [userCoords.lng, userCoords.lat],
+                [destination.lng, destination.lat],
+                [origin.lng, origin.lat],
+            ])
+            map.current.fitBounds(bbox(points) as BBox2d, { padding: 100 })
         }
     }, [destination, map, origin, userCoords, userLocation])
 

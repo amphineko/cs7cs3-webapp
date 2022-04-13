@@ -1,10 +1,10 @@
 import { useQuery } from 'react-query'
 import { useEndpoint } from '../../../../contexts/api'
 import { DestinationSearchEntry } from '../../../api/maps'
-import { UserLocation } from '../../../server/mapbox'
+import { LatLngLike } from '../../../server/mapbox'
 
-export const useReverseQuery = (location?: UserLocation) => {
-    const { endpoint } = useEndpoint()
+export const useReverseQuery = (location?: LatLngLike) => {
+    const { liftEndpoint: endpoint } = useEndpoint()
 
     return useQuery(
         ['geocoding-reverse', location?.lat, location?.lng],

@@ -1,10 +1,4 @@
-import { Options as CacheOptions } from 'node-cache'
-
-export interface UserLocation {
+export interface LatLngLike {
     lat: number
     lng: number
-}
-
-export const defaultServerCacheOptions: CacheOptions = {
-    stdTTL: 60 * 60 * 24,
 }
