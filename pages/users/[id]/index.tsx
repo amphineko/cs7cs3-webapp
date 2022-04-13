@@ -2,6 +2,7 @@ import CommentIcon from '@mui/icons-material/Comment'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import InfoIcon from '@mui/icons-material/Info'
 import NumbersIcon from '@mui/icons-material/Numbers'
+import { LoadingButton } from '@mui/lab'
 import { Alert, Button, Grid, List, ListItem, ListItemAvatar, ListItemText } from '@mui/material'
 import Avatar from '@mui/material/Avatar'
 import Box from '@mui/material/Box'
@@ -104,12 +105,24 @@ const UserProfileBody = ({
 
 const UserProfilePage: NextPage = () => {
     const router = useRouter()
-    const { data: profile, error } = useProfileQuery(String(router.query.id))
+    const { data: profile, error, isLoading } = useProfileQuery(String(router.query.id))
 
     return (
         <>
-            {profile && <UserProfileBody profile={profile} />}
-            {error && <Alert severity="error">{error}</Alert>}
+            {profile ? (
+                <UserProfileBody profile={profile} />
+            ) : (
+                <Grid container direction="column" alignItems="center" paddingY={4}>
+                    <Grid item>
+                        {error && <Alert severity="error">{String(error)}</Alert>}
+                        {isLoading && (
+                            <LoadingButton loading variant="outlined">
+                                Loading
+                            </LoadingButton>
+                        )}
+                    </Grid>
+                </Grid>
+            )}
         </>
     )
 }
