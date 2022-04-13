@@ -1,10 +1,10 @@
 import { GpsFixed } from '@mui/icons-material'
-import { Alert, Button, Grid, Typography, TextField, MenuItem } from '@mui/material'
+import { Alert, Button, Grid, Typography, TextField, MenuItem, Card } from '@mui/material'
 import { useEffect, useState } from 'react'
 import { AddressSearch } from '../../components/inputs/AddressSearch'
 import { useUserLocation } from '../../contexts/userLocation'
 import { DestinationSearchEntry } from '../../libs/api/maps'
-import { Map, Marker } from 'react-map-gl'
+import { Map } from '../../components/display/Map'
 import { JourneyType } from '../../libs/api/groups'
 
 const AddJourney = () => {
@@ -35,6 +35,10 @@ const AddJourney = () => {
         setMethod(event.target.value as JourneyType)
     }
 
+    const handleOnClick = () => {
+        console.log('clicked')
+    }
+
     useEffect(() => {
         currentLocation.readystate === 'ready' && setLng(currentLocation.position.coords.longitude)
         currentLocation.readystate === 'ready' && setLat(currentLocation.position.coords.latitude)
@@ -58,20 +62,18 @@ const AddJourney = () => {
                     </Grid>
                 </Grid>
                 <Grid item paddingTop={2}>
-                    <Map
-                        style={{ height: '70vh' }}
-                        initialViewState={{ longitude: lng, latitude: lat, zoom: 13 }}
-                        mapStyle="mapbox://styles/mapbox/streets-v11"
-                        mapboxAccessToken="pk.eyJ1IjoiYW1waGluZWtvIiwiYSI6ImNrejV0dTRvZTBvdXUyb3FmdHdmbXgyaGkifQ.qSX45S404Pbr9PX9WbjuKA"
-                    >
-                        <Marker latitude={lat} longitude={lng}></Marker>
-                        {origin !== undefined && (
-                            <Marker longitude={origin.position.lng} latitude={origin.position.lat} />
-                        )}
-                        {destination !== undefined && (
-                            <Marker longitude={destination.position.lng} latitude={destination.position.lat} />
-                        )}
-                    </Map>
+                    <Grid item>
+                        <Card>
+                            <Map
+                                accessToken="pk.eyJ1IjoiYW1waGluZWtvIiwiYSI6ImNrejV0dTRvZTBvdXUyb3FmdHdmbXgyaGkifQ.qSX45S404Pbr9PX9WbjuKA"
+                                destination={
+                                    destination !== undefined ? destination.position : { lat: 53.3498, lng: -6.2603 }
+                                }
+                                maxHeight="50vh"
+                                origin={origin !== undefined ? origin.position : { lat: 53.3498, lng: -6.2603 }}
+                            />
+                        </Card>
+                    </Grid>
                     <Typography paddingTop={11}>
                         <Grid container direction="row" alignItems="center">
                             <GpsFixed />
@@ -91,25 +93,29 @@ const AddJourney = () => {
                 </Grid>
 
                 <Grid item alignItems="center">
-                    <TextField
-                        required
-                        label="gneder"
-                        defaultValue={method}
-                        value={method}
-                        onChange={handleChange}
-                        select
-                        variant="filled"
-                    >
-                        {methodList.map((option) => (
-                            <MenuItem key={option.value} value={option.value}>
-                                {option.label}
-                            </MenuItem>
-                        ))}
-                    </TextField>
+                    <Grid container>
+                        <TextField
+                            required
+                            label="gneder"
+                            defaultValue={method}
+                            value={method}
+                            onChange={handleChange}
+                            select
+                            variant="filled"
+                        >
+                            {methodList.map((option) => (
+                                <MenuItem key={option.value} value={option.value}>
+                                    {option.label}
+                                </MenuItem>
+                            ))}
+                        </TextField>
+                    </Grid>
                 </Grid>
 
                 <Grid item>
-                    <Button>Create</Button>
+                    <Button variant="contained" onClick={() => handleOnClick()}>
+                        Create
+                    </Button>
                 </Grid>
             </Grid>
         </>
