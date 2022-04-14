@@ -1,10 +1,24 @@
 import { useQuery } from 'react-query'
+import { useAccessToken } from '../../../../contexts/accessToken'
 import { useEndpoint } from '../../../../contexts/api'
-import { IJourneyGroup } from '../../../api/groups'
 import { LatLngLike } from '../../../server/mapbox'
+import { ApiJourneyGroup } from './useGroupQuery'
+
+type NearbyGroupQueryResult =
+    | {
+          success: false
+          reason: string
+      }
+    | {
+          success: true
+          payload: {
+              journeys: ApiJourneyGroup[]
+          }
+      }
 
 export const useNearbyJourneyGroupsQuery = (destination?: LatLngLike, origin?: LatLngLike) => {
-    const { liftEndpoint: endpoint } = useEndpoint()
+    const { apiEndpoint } = useEndpoint()
+    const { accessToken } = useAccessToken()
 
     return useQuery(
         ['api/v1/journeys/groups', origin?.lat, origin?.lng, destination?.lat, destination?.lng],
@@ -13,15 +27,40 @@ export const useNearbyJourneyGroupsQuery = (destination?: LatLngLike, origin?: L
                 return []
             }
 
-            const url = new URL('api/v1/journeys/groups', endpoint)
-            url.searchParams.set('destLat', String(destination.lat))
-            url.searchParams.set('destLng', String(destination.lng))
-            url.searchParams.set('originLat', String(origin.lat))
-            url.searchParams.set('originLng', String(origin.lng))
+            const url = new URL('journey/get-by-location', apiEndpoint)
+            const req = await fetch(url.toString(), {
+                body: JSON.stringify({
+                    token: accessToken,
+                    timestamp: Date.now(),
+                    payload: {
+                        from: {
+                            latitude: origin.lat,
+                            longitude: origin.lng,
+                        },
+                        to: {
+                            latitude: destination.lat,
+                            longitude: destination.lng,
+                        },
+                    },
+                }),
+                headers: {
+                    'Content-Type': 'application/json',
+                },
+                method: 'POST',
+            })
 
-            const req = await fetch(url.toString())
             if (req.ok) {
-                return (await req.json()) as IJourneyGroup[]
+                const result = (await req.json()) as NearbyGroupQueryResult
+
+                if (result.success === true) {
+                    return result.payload.journeys
+                }
+
+                if (result.reason === 'no journey available') {
+                    return []
+                }
+
+                throw new Error(`Server rejected: ${result.reason}`)
             } else {
                 throw new Error(`fetch() returned an error: ${req.statusText} (${req.status})`)
             }

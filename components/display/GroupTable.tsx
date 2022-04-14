@@ -1,8 +1,11 @@
 import { DirectionsBus, DirectionsWalk, GpsFixed, LocalTaxi, PinDrop, QuestionMark } from '@mui/icons-material'
-import { Avatar, AvatarGroup, Button, Card, CardActions, Grid, Typography } from '@mui/material'
+import { Alert, Avatar, AvatarGroup, Button, Card, CardActions, Grid, Skeleton, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import NextLink from 'next/link'
-import { IJourneyGroup, JourneyType } from '../../libs/api/groups'
+import { JourneyType } from '../../libs/api/groups'
+import { useReverseQuery } from '../../libs/client/queries/geocoding/useReverseQuery'
+import { ApiJourneyGroup } from '../../libs/client/queries/journeys/useGroupQuery'
+import { useProfileQuery } from '../../libs/client/queries/users/useProfileQuery'
 
 const JourneyIconMap: Record<JourneyType, JSX.Element> = {
     bus: <DirectionsBus />,
@@ -10,43 +13,64 @@ const JourneyIconMap: Record<JourneyType, JSX.Element> = {
     walk: <DirectionsWalk />,
 }
 
-export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
+export const GroupCard = ({ group }: { group: ApiJourneyGroup }) => {
+    const originPos = group ? { lat: group.from.latitude, lng: group.from.longitude } : undefined
+    const { data: origin } = useReverseQuery(originPos)
+
+    const destPos = group ? { lat: group.to.latitude, lng: group.to.longitude } : undefined
+    const { data: dest } = useReverseQuery(destPos)
+
+    const { data: host } = useProfileQuery(group.host)
+
     return (
         <Card>
-            <Grid container direction="row" p={2}>
-                <Grid item xs={1}>
-                    <Box>{JourneyIconMap[group.type] ?? <QuestionMark />}</Box>
+            <Grid container direction="column">
+                <Grid item>
+                    {group?.status === 'End' && <Alert severity="warning">Ended</Alert>}
+                    {group?.status === 'Travelling' && <Alert severity="info">In Progress</Alert>}
+                    {group?.status === 'Waiting' && <Alert severity="success">Available</Alert>}
                 </Grid>
-                <Grid item container xs={11}>
-                    <Grid item container direction="column" spacing={2}>
-                        <Grid item container>
-                            <Grid item p={1}>
-                                <GpsFixed aria-label="From" />
+                <Grid container direction="row" p={2}>
+                    <Grid item xs={1}>
+                        <Box>{JourneyIconMap['walk'] ?? <QuestionMark />}</Box>
+                    </Grid>
+                    <Grid item container xs={11}>
+                        <Grid item container direction="column" spacing={2}>
+                            <Grid item container>
+                                <Grid item p={1}>
+                                    <GpsFixed aria-label="From" />
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="subtitle1">{origin?.[0].displayName}</Typography>
+                                    <Typography variant="subtitle2">{origin?.[0].address}</Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1">{group.origin.displayName}</Typography>
-                                <Typography variant="subtitle2">{group.origin.address}</Typography>
-                            </Grid>
-                        </Grid>
 
-                        <Grid item container>
-                            <Grid item p={1}>
-                                <PinDrop aria-label="To" />
+                            <Grid item container>
+                                <Grid item p={1}>
+                                    <PinDrop aria-label="To" />
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="subtitle1">{dest?.[0].displayName}</Typography>
+                                    <Typography variant="subtitle2">{dest?.[0].address}</Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1">{group.destination.displayName}</Typography>
-                                <Typography variant="subtitle2">{group.destination.address}</Typography>
-                            </Grid>
-                        </Grid>
 
-                        <Grid item container direction="row" alignItems="center">
-                            <Grid item px={1}>
-                                <AvatarGroup total={group.guests.length + 1}>
-                                    <Avatar alt={group.host.screenName} src={group.host.avatarUrl} />
-                                </AvatarGroup>
-                            </Grid>
-                            <Grid item>
-                                <Typography variant="caption">{group.host.screenName}</Typography>
+                            <Grid item container direction="row" alignItems="center">
+                                {group && host ? (
+                                    <>
+                                        <Grid item px={1}>
+                                            <AvatarGroup total={group.members.length}>
+                                                <Avatar alt={host.username} src={host.avatar} />
+                                            </AvatarGroup>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography variant="caption">{host?.username}</Typography>
+                                        </Grid>
+                                    </>
+                                ) : (
+                                    <Skeleton width={40} height={40} />
+                                )}
                             </Grid>
                         </Grid>
                     </Grid>
@@ -62,7 +86,7 @@ export const GroupCard = ({ group }: { group: IJourneyGroup }) => {
     )
 }
 
-export const GroupTable = ({ groups }: { groups: IJourneyGroup[] }) => {
+export const GroupTable = ({ groups }: { groups: ApiJourneyGroup[] }) => {
     return (
         <Grid container spacing={2}>
             {groups.map((group) => (

@@ -624,6 +624,11 @@
   resolved "https://registry.yarnpkg.com/@rushstack/eslint-patch/-/eslint-patch-1.0.8.tgz#be3e914e84eacf16dbebd311c0d0b44aa1174c64"
   integrity sha512-ZK5v4bJwgXldAUA8r3q9YKfCwOqoHTK/ZqRjSeRXQrBXWouoPnS4MQtgC4AXGiiBuUu5wxrRgTlv0ktmM4P1Aw==
 
+"@simbathesailor/use-what-changed@^2.0.0":
+  version "2.0.0"
+  resolved "https://registry.yarnpkg.com/@simbathesailor/use-what-changed/-/use-what-changed-2.0.0.tgz#7f82d78f92c8588b5fadd702065dde93bd781403"
+  integrity sha512-ulBNrPSvfho9UN6zS2fii3AsdEcp2fMaKeqUZZeCNPaZbB6aXyTUhpEN9atjMAbu/eyK3AY8L4SYJUG62Ekocw==
+
 "@sindresorhus/is@^2.0.0":
   version "2.1.1"
   resolved "https://registry.yarnpkg.com/@sindresorhus/is/-/is-2.1.1.tgz#ceff6a28a5b4867c2dd4a1ba513de278ccbe8bb1"
