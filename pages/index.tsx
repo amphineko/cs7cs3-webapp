@@ -22,7 +22,7 @@ const IndexPage = () => {
     const { id: selfId } = useAccessToken()
 
     const handleCreateNew = () => {
-        const journeyId = useCreateNewJourneyQuery(selfId, origin.position, destination.position);
+        const journeyId = useCreateNewJourneyQuery(selfId, origin.position, destination.position)
         router.push(`/journey/` + journeyId).catch((err) => console.error(err))
     }
 

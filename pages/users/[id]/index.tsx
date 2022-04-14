@@ -22,7 +22,7 @@ const UserProfileBody = ({
 }: {
     profile: IUserProfile
 }) => {
-    var miniHistories = []
+    let miniHistories = []
     histories.map((historyId) => {
         const { data: group } = useJourneyGroupQuery(historyId)
         const host = group?.host

@@ -7,6 +7,7 @@ import { Map } from '../../components/display/Map'
 import { useAccessToken } from '../../contexts/accessToken'
 import { useDirectionQuery } from '../../libs/client/queries/directions/useDirectionQuery'
 import { useReverseQuery } from '../../libs/client/queries/geocoding/useReverseQuery'
+import { useArriveMutation } from '../../libs/client/queries/journeys/useArriveMutation'
 import { useExitMutation } from '../../libs/client/queries/journeys/useExitMutation'
 import {
     ApiJourneyGroup,
@@ -75,9 +76,16 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
         })
     }
 
-    const { mutate: exitMutate } = useExitMutation(group?.id)
+    const { mutate: exitMutate } = useExitMutation(id)
     const exit = () => {
         exitMutate(void 0, {
+            onSettled: () => groupQueryRemove(),
+        })
+    }
+
+    const { mutate: arriveMutate } = useArriveMutation(id)
+    const arrive = () => {
+        arriveMutate(void 0, {
             onSettled: () => groupQueryRemove(),
         })
     }
@@ -166,6 +174,14 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                 <Grid item>
                     <Button variant="contained" color="secondary" onClick={() => exit()}>
                         Leave
+                    </Button>
+                </Grid>
+            )}
+
+            {hasJoined && (
+                <Grid item>
+                    <Button variant="contained" color="secondary" onClick={() => arrive()}>
+                        Arrive
                     </Button>
                 </Grid>
             )}
