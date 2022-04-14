@@ -1,17 +1,20 @@
 import { GpsFixed, PinDrop } from '@mui/icons-material'
-import { Alert, Avatar, Box, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Button, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
 import { GetServerSideProps, NextPage } from 'next'
 import React, { useMemo } from 'react'
 import { validate as validateUuid } from 'uuid'
 import { Map } from '../../components/display/Map'
+import { useAccessToken } from '../../contexts/accessToken'
 import { useDirectionQuery } from '../../libs/client/queries/directions/useDirectionQuery'
 import { useReverseQuery } from '../../libs/client/queries/geocoding/useReverseQuery'
+import { useExitMutation } from '../../libs/client/queries/journeys/useExitMutation'
 import {
     ApiJourneyGroup,
     ApiJourneyGroupMemberStatus,
     getApiJourneyGroup,
     useJourneyGroupQuery,
 } from '../../libs/client/queries/journeys/useGroupQuery'
+import { useJoinMutation } from '../../libs/client/queries/journeys/useJoinMutation'
 import { useProfileQuery } from '../../libs/client/queries/users/useProfileQuery'
 
 interface ServerSideProps {
@@ -45,7 +48,7 @@ const UserRow = ({ id, status }: { id: string; status?: ApiJourneyGroupMemberSta
 }
 
 const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: initialData, id }: ServerSideProps) => {
-    const { data: group } = useJourneyGroupQuery(id, initialData)
+    const { data: group, remove: groupQueryRemove } = useJourneyGroupQuery(id, initialData)
     const originPos = useMemo(
         () => (group ? { lat: group.from.latitude, lng: group.from.longitude } : undefined),
         [group]
@@ -59,6 +62,25 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
     const { data: dest } = useReverseQuery(destinationPos)
 
     const { data: direction } = useDirectionQuery(originPos, destinationPos, 'walk') // TODO: use server returned direction type
+
+    const { id: userId } = useAccessToken()
+    const hasJoined = useMemo(() => {
+        return group?.members.some((member) => member.userId === userId) ?? false
+    }, [group?.members, userId])
+
+    const { mutate: joinMutate } = useJoinMutation(id)
+    const join = () => {
+        joinMutate(void 0, {
+            onSettled: () => groupQueryRemove(),
+        })
+    }
+
+    const { mutate: exitMutate } = useExitMutation(group?.id)
+    const exit = () => {
+        exitMutate(void 0, {
+            onSettled: () => groupQueryRemove(),
+        })
+    }
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>
@@ -131,6 +153,22 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                     </Grid>
                 </Card>
             </Grid>
+
+            {group?.status === 'Waiting' && !hasJoined && (
+                <Grid item>
+                    <Button variant="contained" color="primary" onClick={() => join()}>
+                        Join
+                    </Button>
+                </Grid>
+            )}
+
+            {hasJoined && (
+                <Grid item>
+                    <Button variant="contained" color="secondary" onClick={() => exit()}>
+                        Leave
+                    </Button>
+                </Grid>
+            )}
 
             <Grid item>
                 <Card>
