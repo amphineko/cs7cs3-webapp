@@ -12,13 +12,27 @@ import Typography from '@mui/material/Typography'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import Link from 'next/link'
+import { useJourneyGroupQuery } from '../../../libs/client/queries/journeys/useGroupQuery'
 import { IUserProfile, useProfileQuery } from '../../../libs/client/queries/users/useProfileQuery'
 
 const UserProfileBody = ({
-    profile: { avatar, bio, counter, id, reviews, rating, username },
+    profile: { avatar, bio, id, reviews, rating, username, histories },
 }: {
     profile: IUserProfile
 }) => {
+    var miniHistories = []
+    histories.map((historyId) => {
+        const { data: group } = useJourneyGroupQuery(historyId)
+        const from = group?.origin.displayName
+        const to = group?.destination.displayName
+        miniHistories.push({
+            id: historyId,
+            from: from,
+            to: to
+        })
+    })
+
     const router = useRouter()
 
     const handleEdit = () => {
@@ -79,7 +93,7 @@ const UserProfileBody = ({
                                 <ListItemAvatar>
                                     <NumbersIcon fontSize="large" color="secondary" />
                                 </ListItemAvatar>
-                                <ListItemText primary="Total journeys" secondary={counter} />
+                                <ListItemText primary="Total journeys" secondary={histories.length} />
                             </ListItem>
                             <ListItem alignItems="center">
                                 <ListItemAvatar>
@@ -87,6 +101,24 @@ const UserProfileBody = ({
                                 </ListItemAvatar>
                                 <ListItemText primary="Total reviews" secondary={reviews.length} />
                             </ListItem>
+                        </List>
+
+                        <List
+                            sx={{
+                                bgcolor: 'background.paper',
+                                width: '100%',
+                            }}
+                        >
+                            {miniHistories.map((item) => (
+                                <Link href={`/journey/` + item.id} passHref>
+                                    <ListItem>
+                                        <ListItemAvatar>
+                                            <NumbersIcon fontSize="large" color="secondary" />
+                                        </ListItemAvatar>
+                                        <ListItemText primary={"From: " + item.from} secondary={"To: " + item.to} />
+                                    </ListItem>
+                                </Link>
+                            ))}
                         </List>
                     </Box>
                 </Grid>
