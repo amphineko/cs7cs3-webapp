@@ -1,10 +1,13 @@
 import { GpsFixed, PinDrop } from '@mui/icons-material'
-import { Alert, Grid, Typography } from '@mui/material'
+import { Alert, Box, Button, Grid, Typography } from '@mui/material'
+import { useRouter } from 'next/router'
 import { useState } from 'react'
 import { GroupTable } from '../components/display/GroupTable'
 import { AddressSearch } from '../components/inputs/AddressSearch'
+import { useAccessToken } from '../contexts/accessToken'
 import { useUserLocation } from '../contexts/userLocation'
 import { DestinationSearchEntry } from '../libs/api/maps'
+import { useCreateNewJourneyQuery } from '../libs/client/queries/journeys/useCreateNewJourneyQuery'
 import { useNearbyJourneyGroupsQuery } from '../libs/client/queries/journeys/useNearbyGroupsQuery'
 
 const IndexPage = () => {
@@ -14,6 +17,14 @@ const IndexPage = () => {
     const [origin, setOrigin] = useState<DestinationSearchEntry>()
 
     const { data: nearbyGroups } = useNearbyJourneyGroupsQuery(destination?.position, origin?.position)
+
+    const router = useRouter()
+    const { id: selfId } = useAccessToken()
+
+    const handleCreateNew = () => {
+        const journeyId = useCreateNewJourneyQuery(selfId, origin.position, destination.position);
+        router.push(`/journey/` + journeyId).catch((err) => console.error(err))
+    }
 
     return (
         <Grid container alignItems="center" minHeight="100vh">
@@ -47,6 +58,14 @@ const IndexPage = () => {
                         </Grid>
                     </Typography>
                     <AddressSearch onChange={(value) => setDestination(value)} />
+                </Grid>
+
+                <Grid item xs={13} paddingY={2}>
+                    <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
+                        <Button variant="contained" color="success" onClick={handleCreateNew}>
+                            Create New
+                        </Button>
+                    </Box>
                 </Grid>
 
                 <Grid item>
