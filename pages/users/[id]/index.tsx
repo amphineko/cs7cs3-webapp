@@ -13,17 +13,32 @@ import Typography from '@mui/material/Typography'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import * as React from 'react'
-import { useAccessToken } from '../../../contexts/accessToken'
+import Link from 'next/link'
+import { useJourneyGroupQuery } from '../../../libs/client/queries/journeys/useGroupQuery'
 import { IUserProfile, useProfileQuery } from '../../../libs/client/queries/users/useProfileQuery'
+import { useAccessToken } from '../../../contexts/accessToken'
+
+const UserHistory = ({ id }: { id: string }) => {
+    const { data: group } = useJourneyGroupQuery(id)
+    const { data: userInfo } = useProfileQuery(group?.host)
+
+    return (
+        <Link href={`/journey/${id}`} passHref>
+            <ListItemAvatar>
+                <NumbersIcon fontSize="large" color="secondary" />
+            </ListItemAvatar>
+            <ListItemText primary={`Hosted By: ${userInfo?.username}`} />
+        </Link>
+    )
+}
 
 const UserProfileBody = ({
-    profile: { avatar, bio, counter, gender, id, reviews, rating, username },
+    profile: { avatar, bio, gender, id, reviews, rating, username, histories },
 }: {
     profile: IUserProfile
 }) => {
     const router = useRouter()
     const { id: me } = useAccessToken()
-
     const handleEdit = () => {
         router.push(`/users/${id}/edit`).catch((err) => console.error(err))
     }
@@ -84,7 +99,7 @@ const UserProfileBody = ({
                                 <ListItemAvatar>
                                     <NumbersIcon fontSize="large" color="secondary" />
                                 </ListItemAvatar>
-                                <ListItemText primary="Total journeys" secondary={counter} />
+                                <ListItemText primary="Total journeys" secondary={histories.length} />
                             </ListItem>
                             <ListItem alignItems="center">
                                 <ListItemAvatar>
@@ -92,6 +107,19 @@ const UserProfileBody = ({
                                 </ListItemAvatar>
                                 <ListItemText primary="Total reviews" secondary={reviews.length} />
                             </ListItem>
+                        </List>
+
+                        <List
+                            sx={{
+                                bgcolor: 'background.paper',
+                                width: '100%',
+                            }}
+                        >
+                            {histories.map((item) => (
+                                <ListItem key={item}>
+                                    <UserHistory id={item} />
+                                </ListItem>
+                            ))}
                         </List>
                     </Box>
                 </Grid>
