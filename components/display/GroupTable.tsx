@@ -1,5 +1,5 @@
 import { DirectionsBus, DirectionsWalk, GpsFixed, LocalTaxi, PinDrop, QuestionMark } from '@mui/icons-material'
-import { Avatar, AvatarGroup, Button, Card, CardActions, Grid, Skeleton, Typography } from '@mui/material'
+import { Alert, Avatar, AvatarGroup, Button, Card, CardActions, Grid, Skeleton, Typography } from '@mui/material'
 import { Box } from '@mui/system'
 import NextLink from 'next/link'
 import { JourneyType } from '../../libs/api/groups'
@@ -24,47 +24,54 @@ export const GroupCard = ({ group }: { group: ApiJourneyGroup }) => {
 
     return (
         <Card>
-            <Grid container direction="row" p={2}>
-                <Grid item xs={1}>
-                    <Box>{JourneyIconMap['walk'] ?? <QuestionMark />}</Box>
+            <Grid container direction="column">
+                <Grid item>
+                    {group?.status === 'End' && <Alert severity="warning">Ended</Alert>}
+                    {group?.status === 'Travelling' && <Alert severity="info">In Progress</Alert>}
+                    {group?.status === 'Waiting' && <Alert severity="success">Available</Alert>}
                 </Grid>
-                <Grid item container xs={11}>
-                    <Grid item container direction="column" spacing={2}>
-                        <Grid item container>
-                            <Grid item p={1}>
-                                <GpsFixed aria-label="From" />
+                <Grid container direction="row" p={2}>
+                    <Grid item xs={1}>
+                        <Box>{JourneyIconMap['walk'] ?? <QuestionMark />}</Box>
+                    </Grid>
+                    <Grid item container xs={11}>
+                        <Grid item container direction="column" spacing={2}>
+                            <Grid item container>
+                                <Grid item p={1}>
+                                    <GpsFixed aria-label="From" />
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="subtitle1">{origin?.[0].displayName}</Typography>
+                                    <Typography variant="subtitle2">{origin?.[0].address}</Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1">{origin?.[0].displayName}</Typography>
-                                <Typography variant="subtitle2">{origin?.[0].address}</Typography>
-                            </Grid>
-                        </Grid>
 
-                        <Grid item container>
-                            <Grid item p={1}>
-                                <PinDrop aria-label="To" />
+                            <Grid item container>
+                                <Grid item p={1}>
+                                    <PinDrop aria-label="To" />
+                                </Grid>
+                                <Grid item>
+                                    <Typography variant="subtitle1">{dest?.[0].displayName}</Typography>
+                                    <Typography variant="subtitle2">{dest?.[0].address}</Typography>
+                                </Grid>
                             </Grid>
-                            <Grid item>
-                                <Typography variant="subtitle1">{dest?.[0].displayName}</Typography>
-                                <Typography variant="subtitle2">{dest?.[0].address}</Typography>
-                            </Grid>
-                        </Grid>
 
-                        <Grid item container direction="row" alignItems="center">
-                            {group && host ? (
-                                <>
-                                    <Grid item px={1}>
-                                        <AvatarGroup total={group.members.length}>
-                                            <Avatar alt={host.username} src={host.avatar} />
-                                        </AvatarGroup>
-                                    </Grid>
-                                    <Grid item>
-                                        <Typography variant="caption">{host?.username}</Typography>
-                                    </Grid>
-                                </>
-                            ) : (
-                                <Skeleton width={40} height={40} />
-                            )}
+                            <Grid item container direction="row" alignItems="center">
+                                {group && host ? (
+                                    <>
+                                        <Grid item px={1}>
+                                            <AvatarGroup total={group.members.length}>
+                                                <Avatar alt={host.username} src={host.avatar} />
+                                            </AvatarGroup>
+                                        </Grid>
+                                        <Grid item>
+                                            <Typography variant="caption">{host?.username}</Typography>
+                                        </Grid>
+                                    </>
+                                ) : (
+                                    <Skeleton width={40} height={40} />
+                                )}
+                            </Grid>
                         </Grid>
                     </Grid>
                 </Grid>

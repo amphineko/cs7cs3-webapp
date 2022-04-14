@@ -1,5 +1,5 @@
 import { GpsFixed, PinDrop } from '@mui/icons-material'
-import { Avatar, Box, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
+import { Alert, Avatar, Box, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
 import { GetServerSideProps, NextPage } from 'next'
 import React, { useMemo } from 'react'
 import { validate as validateUuid } from 'uuid'
@@ -8,6 +8,7 @@ import { useDirectionQuery } from '../../libs/client/queries/directions/useDirec
 import { useReverseQuery } from '../../libs/client/queries/geocoding/useReverseQuery'
 import {
     ApiJourneyGroup,
+    ApiJourneyGroupMemberStatus,
     getApiJourneyGroup,
     useJourneyGroupQuery,
 } from '../../libs/client/queries/journeys/useGroupQuery'
@@ -20,18 +21,26 @@ interface ServerSideProps {
     id?: string
 }
 
-const UserRow = ({ id }: { id: string }) => {
+const UserRow = ({ id, status }: { id: string; status?: ApiJourneyGroupMemberStatus }) => {
     const { data: user } = useProfileQuery(id)
 
     return (
-        <>
+        <Grid container direction="row" alignItems="center">
             <Grid item px={1}>
                 {user ? <Avatar alt={user?.username} src={user?.avatar} /> : <Skeleton variant="circular" />}
             </Grid>
-            <Grid item>
+            <Grid item flexGrow={1}>
                 {user ? <Typography variant="caption">{user?.username}</Typography> : <Skeleton width={240} />}
             </Grid>
-        </>
+            {status && (
+                <Grid item>
+                    {status === 'Arrived' && <Alert severity="success">Arrived</Alert>}
+                    {status === 'PendingApproval' && <Alert severity="warning">Pending Approval</Alert>}
+                    {status === 'Travelling' && <Alert severity="success">Travelling</Alert>}
+                    {status === 'Waiting' && <Alert severity="info">Waiting</Alert>}
+                </Grid>
+            )}
+        </Grid>
     )
 }
 
@@ -53,6 +62,16 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>
+            <Grid item>
+                {group?.status === 'End' && <Alert severity="warning">This journey has ended.</Alert>}
+                {group?.status === 'Travelling' && (
+                    <Alert severity="info">This journey is currently in progress.</Alert>
+                )}
+                {group?.status === 'Waiting' && (
+                    <Alert severity="success">This journey has not started yet, and you can join it.</Alert>
+                )}
+            </Grid>
+
             <Grid item>
                 <Card>
                     <Map
@@ -141,9 +160,9 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                             </Box>
                         </Grid>
                         <Grid item container direction="column" alignItems="center" spacing={2} p={1}>
-                            {group?.members.map(({ userId: id }) => (
+                            {group?.members.map(({ userId: id, status }) => (
                                 <Grid item container alignItems="center" key={id}>
-                                    <UserRow id={id} />
+                                    <UserRow id={id} status={status} />
                                 </Grid>
                             ))}
                         </Grid>

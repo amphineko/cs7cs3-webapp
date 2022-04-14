@@ -3,6 +3,8 @@ import { validate as validateUuid } from 'uuid'
 import { useAccessToken } from '../../../../contexts/accessToken'
 import { useEndpoint } from '../../../../contexts/api'
 
+export type ApiJourneyGroupMemberStatus = 'PendingApproval' | 'Waiting' | 'Travelling' | 'Arrived'
+
 export type ApiJourneyGroup = {
     id: string
 
@@ -22,7 +24,7 @@ export type ApiJourneyGroup = {
     members: [
         {
             userId: string
-            status: 'PendingApproval' | 'Waiting' | 'Travelling' | 'Arrived'
+            status: ApiJourneyGroupMemberStatus
         }
     ]
 }
