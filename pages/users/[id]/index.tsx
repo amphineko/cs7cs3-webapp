@@ -1,3 +1,4 @@
+import { FemaleOutlined, MaleOutlined } from '@mui/icons-material'
 import CommentIcon from '@mui/icons-material/Comment'
 import EmojiEventsIcon from '@mui/icons-material/EmojiEvents'
 import InfoIcon from '@mui/icons-material/Info'
@@ -15,7 +16,7 @@ import * as React from 'react'
 import { IUserProfile, useProfileQuery } from '../../../libs/client/queries/users/useProfileQuery'
 
 const UserProfileBody = ({
-    profile: { avatar, bio, counter, id, reviews, rating, username },
+    profile: { avatar, bio, counter, gender, id, reviews, rating, username },
 }: {
     profile: IUserProfile
 }) => {
@@ -31,7 +32,9 @@ const UserProfileBody = ({
                 <Box display="flex" justifyContent="center" alignItems="center">
                     <Avatar sx={{ bgcolor: blueGrey[500], width: 100, height: 100 }} src={avatar} />
                 </Box>
-                <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
+                <Box display="flex" flexDirection="row" justifyContent="center" alignItems="center" paddingTop={2}>
+                    {gender === 'female' && <FemaleOutlined htmlColor="#1F4788" />}
+                    {gender === 'male' && <MaleOutlined htmlColor="#F2666C" />}
                     <Typography variant="body1" component="div" gutterBottom>
                         {username}
                     </Typography>
