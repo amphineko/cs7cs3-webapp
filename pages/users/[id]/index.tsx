@@ -13,6 +13,7 @@ import Typography from '@mui/material/Typography'
 import { NextPage } from 'next'
 import { useRouter } from 'next/router'
 import * as React from 'react'
+import { useAccessToken } from '../../../contexts/accessToken'
 import { IUserProfile, useProfileQuery } from '../../../libs/client/queries/users/useProfileQuery'
 
 const UserProfileBody = ({
@@ -21,6 +22,7 @@ const UserProfileBody = ({
     profile: IUserProfile
 }) => {
     const router = useRouter()
+    const { id: me } = useAccessToken()
 
     const handleEdit = () => {
         router.push(`/users/${id}/edit`).catch((err) => console.error(err))
@@ -95,13 +97,15 @@ const UserProfileBody = ({
                 </Grid>
             </Grid>
 
-            <Grid item xs={13} paddingY={2}>
-                <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
-                    <Button variant="contained" color="success" onClick={handleEdit}>
-                        Edit
-                    </Button>
-                </Box>
-            </Grid>
+            {id === me && (
+                <Grid item xs={13} paddingY={2}>
+                    <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
+                        <Button variant="contained" color="success" onClick={handleEdit}>
+                            Edit
+                        </Button>
+                    </Box>
+                </Grid>
+            )}
         </Grid>
     )
 }
