@@ -46,7 +46,7 @@ const RegisterPage: NextPage = () => {
                 <PersonAddAlt />
             </Avatar>
             <Typography component="h1" variant="h5">
-                Sign in
+                Sign up
             </Typography>
             <Box sx={{ mt: 1 }}>
                 {error && <Alert severity="error">{(error as Error)?.message}</Alert>}

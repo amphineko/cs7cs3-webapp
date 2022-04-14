@@ -1,6 +1,7 @@
 import { GpsFixed, PinDrop } from '@mui/icons-material'
 import { Alert, Avatar, Box, Button, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
 import { GetServerSideProps, NextPage } from 'next'
+import Link from 'next/link'
 import React, { useMemo } from 'react'
 import { validate as validateUuid } from 'uuid'
 import { Map } from '../../components/display/Map'
@@ -197,7 +198,11 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                             </Box>
                         </Grid>
                         <Grid item container direction="row" alignItems="center" p={1}>
-                            <UserRow id={group?.host} />
+                            <Link href={`/users/${group?.host}`} passHref>
+                                <Button sx={{ width: '100%' }}>
+                                    <UserRow id={group?.host} />
+                                </Button>
+                            </Link>
                         </Grid>
                     </Grid>
                 </Card>
@@ -216,7 +221,11 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                         <Grid item container direction="column" alignItems="center" spacing={2} p={1}>
                             {group?.members.map(({ userId: id, status }) => (
                                 <Grid item container alignItems="center" key={id}>
-                                    <UserRow id={id} status={status} />
+                                    <Link href={`/users/${id}`} passHref>
+                                        <Button sx={{ width: '100%' }}>
+                                            <UserRow id={id} status={status} />
+                                        </Button>
+                                    </Link>
                                 </Grid>
                             ))}
                         </Grid>

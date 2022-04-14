@@ -123,13 +123,15 @@ const UserProfileBody = ({
                 </Grid>
             </Grid>
 
-            <Grid item xs={13} paddingY={2}>
-                <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
-                    <Button variant="contained" color="success" onClick={handleEdit}>
-                        Edit
-                    </Button>
-                </Box>
-            </Grid>
+            {id === me && (
+                <Grid item xs={13} paddingY={2}>
+                    <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
+                        <Button variant="contained" color="success" onClick={handleEdit}>
+                            Edit
+                        </Button>
+                    </Box>
+                </Grid>
+            )}
         </Grid>
     )
 }
