@@ -16,6 +16,7 @@ import * as React from 'react'
 import Link from 'next/link'
 import { useJourneyGroupQuery } from '../../../libs/client/queries/journeys/useGroupQuery'
 import { IUserProfile, useProfileQuery } from '../../../libs/client/queries/users/useProfileQuery'
+import { useAccessToken } from '../../../contexts/accessToken'
 
 const UserHistory = ({ id }: { id: string }) => {
     const { data: group } = useJourneyGroupQuery(id)
@@ -37,6 +38,7 @@ const UserProfileBody = ({
     profile: IUserProfile
 }) => {
     const router = useRouter()
+    const { id: me } = useAccessToken()
     const handleEdit = () => {
         router.push(`/users/${id}/edit`).catch((err) => console.error(err))
     }
