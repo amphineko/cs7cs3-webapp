@@ -8,6 +8,7 @@ export interface IUserProfile {
 
     avatar: string
     bio: string
+    gender: 'male' | 'female' | 'other'
 
     rating: number
     counter: number
