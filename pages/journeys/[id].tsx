@@ -1,28 +1,35 @@
 import { GpsFixed, PinDrop } from '@mui/icons-material'
 import { Avatar, Box, Card, Divider, Grid, Skeleton, Typography } from '@mui/material'
 import { GetServerSideProps, NextPage } from 'next'
-import React from 'react'
+import React, { useMemo } from 'react'
 import { validate as validateUuid } from 'uuid'
 import { Map } from '../../components/display/Map'
-import { IJourneyGroup, IJourneyParticipant } from '../../libs/api/groups'
 import { useDirectionQuery } from '../../libs/client/queries/directions/useDirectionQuery'
-import { getJourneyGroup, useJourneyGroupQuery } from '../../libs/client/queries/journeys/useGroupQuery'
+import { useReverseQuery } from '../../libs/client/queries/geocoding/useReverseQuery'
+import {
+    ApiJourneyGroup,
+    getApiJourneyGroup,
+    useJourneyGroupQuery,
+} from '../../libs/client/queries/journeys/useGroupQuery'
+import { useProfileQuery } from '../../libs/client/queries/users/useProfileQuery'
 
 interface ServerSideProps {
     accessToken: string
     error?: string
-    group?: IJourneyGroup
+    group?: ApiJourneyGroup
     id?: string
 }
 
-const UserRow = ({ user }: { user: IJourneyParticipant }) => {
+const UserRow = ({ id }: { id: string }) => {
+    const { data: user } = useProfileQuery(id)
+
     return (
         <>
             <Grid item px={1}>
-                {user ? <Avatar alt={user.screenName} src={user.avatarUrl} /> : <Skeleton variant="circular" />}
+                {user ? <Avatar alt={user?.username} src={user?.avatar} /> : <Skeleton variant="circular" />}
             </Grid>
             <Grid item>
-                {user ? <Typography variant="caption">{user.screenName}</Typography> : <Skeleton width={240} />}
+                {user ? <Typography variant="caption">{user?.username}</Typography> : <Skeleton width={240} />}
             </Grid>
         </>
     )
@@ -30,7 +37,19 @@ const UserRow = ({ user }: { user: IJourneyParticipant }) => {
 
 const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: initialData, id }: ServerSideProps) => {
     const { data: group } = useJourneyGroupQuery(id, initialData)
-    const { data: direction } = useDirectionQuery(group?.origin.position, group?.destination.position, group?.type)
+    const originPos = useMemo(
+        () => (group ? { lat: group.from.latitude, lng: group.from.longitude } : undefined),
+        [group]
+    )
+    const destinationPos = useMemo(
+        () => (group ? { lat: group.to.latitude, lng: group.to.longitude } : undefined),
+        [group]
+    )
+
+    const { data: origin } = useReverseQuery(originPos)
+    const { data: dest } = useReverseQuery(destinationPos)
+
+    const { data: direction } = useDirectionQuery(originPos, destinationPos, 'walk') // TODO: use server returned direction type
 
     return (
         <Grid container direction="column" paddingY={2} spacing={2}>
@@ -38,10 +57,10 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                 <Card>
                     <Map
                         accessToken={accessToken}
-                        destination={group?.destination.position}
+                        destination={destinationPos}
                         direction={direction}
                         maxHeight="50vh"
-                        origin={group?.origin.position}
+                        origin={originPos}
                     />
                 </Card>
             </Grid>
@@ -57,8 +76,12 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                             </Grid>
                             {group ? (
                                 <Grid item alignItems="center" justifyContent="center" xs={11}>
-                                    <Typography variant="subtitle1">{group.origin.displayName}</Typography>
-                                    <Typography variant="subtitle2">{group.origin.address}</Typography>
+                                    <Typography variant="subtitle1">
+                                        {origin?.[0].displayName ?? <Skeleton width={240} />}
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        {origin?.[0].address ?? <Skeleton width={240} />}
+                                    </Typography>
                                 </Grid>
                             ) : (
                                 <Skeleton width={240} />
@@ -75,8 +98,12 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                             </Grid>
                             {group ? (
                                 <Grid item alignItems="center" justifyContent="center" xs={11}>
-                                    <Typography variant="subtitle1">{group.destination.displayName}</Typography>
-                                    <Typography variant="subtitle2">{group.destination.address}</Typography>
+                                    <Typography variant="subtitle1">
+                                        {dest?.[0].displayName ?? <Skeleton width={240} />}
+                                    </Typography>
+                                    <Typography variant="subtitle2">
+                                        {dest?.[0].address ?? <Skeleton width={240} />}
+                                    </Typography>
                                 </Grid>
                             ) : (
                                 <Skeleton width={240} />
@@ -97,7 +124,7 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                             </Box>
                         </Grid>
                         <Grid item container direction="row" alignItems="center" p={1}>
-                            <UserRow user={group?.host} />
+                            <UserRow id={group?.host} />
                         </Grid>
                     </Grid>
                 </Card>
@@ -114,9 +141,9 @@ const JourneyDetailPage: NextPage<ServerSideProps> = ({ accessToken, group: init
                             </Box>
                         </Grid>
                         <Grid item container direction="column" alignItems="center" spacing={2} p={1}>
-                            {group?.guests.map((user) => (
-                                <Grid item container alignItems="center" key={user.id}>
-                                    <UserRow user={user} />
+                            {group?.members.map(({ userId: id }) => (
+                                <Grid item container alignItems="center" key={id}>
+                                    <UserRow id={id} />
                                 </Grid>
                             ))}
                         </Grid>
@@ -142,7 +169,7 @@ export const getServerSideProps: GetServerSideProps<ServerSideProps> = async ({ 
     }
 
     try {
-        const group = await getJourneyGroup(id, process.env.IONPROPELLER_URL)
+        const group = (await getApiJourneyGroup(id, process.env.API_URL)) ?? null
         return { props: { accessToken, group, id } }
     } catch (error) {
         return { props: { accessToken, error: (error as Error)?.message ?? 'unknown error', id } }
