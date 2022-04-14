@@ -17,24 +17,26 @@ import Link from 'next/link'
 import { useJourneyGroupQuery } from '../../../libs/client/queries/journeys/useGroupQuery'
 import { IUserProfile, useProfileQuery } from '../../../libs/client/queries/users/useProfileQuery'
 
+const UserHistory = ({ id }: { id: string }) => {
+    const { data: group } = useJourneyGroupQuery(id)
+    const { data: userInfo } = useProfileQuery(group?.host)
+
+    return (
+        <Link href={`/journey/${id}`} passHref>
+            <ListItemAvatar>
+                <NumbersIcon fontSize="large" color="secondary" />
+            </ListItemAvatar>
+            <ListItemText primary={`Hosted By: ${userInfo?.username}`} />
+        </Link>
+    )
+}
+
 const UserProfileBody = ({
     profile: { avatar, bio, gender, id, reviews, rating, username, histories },
 }: {
     profile: IUserProfile
 }) => {
-    let miniHistories = []
-    histories.map((historyId) => {
-        const { data: group } = useJourneyGroupQuery(historyId)
-        const host = group?.host
-        const { data: userInfo } = useProfileQuery(host)
-        miniHistories.push({
-            id: historyId,
-            host: userInfo.username,
-        })
-    })
-
     const router = useRouter()
-
     const handleEdit = () => {
         router.push(`/users/${id}/edit`).catch((err) => console.error(err))
     }
@@ -111,15 +113,10 @@ const UserProfileBody = ({
                                 width: '100%',
                             }}
                         >
-                            {miniHistories.map((item) => (
-                                <Link href={`/journey/` + item.id} passHref>
-                                    <ListItem>
-                                        <ListItemAvatar>
-                                            <NumbersIcon fontSize="large" color="secondary" />
-                                        </ListItemAvatar>
-                                        <ListItemText primary={"Hosted By: " + item.host} />
-                                    </ListItem>
-                                </Link>
+                            {histories.map((item) => (
+                                <ListItem key={item}>
+                                    <UserHistory id={item} />
+                                </ListItem>
                             ))}
                         </List>
                     </Box>

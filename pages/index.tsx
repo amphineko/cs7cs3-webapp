@@ -21,9 +21,9 @@ const IndexPage = () => {
     const router = useRouter()
     const { id: selfId } = useAccessToken()
 
-    const handleCreateNew = () => {
-        const journeyId = useCreateNewJourneyQuery(selfId, origin.position, destination.position)
-        router.push(`/journey/` + journeyId).catch((err) => console.error(err))
+    const useHandleCreateNew = () => {
+        const { data: journeyId } = useCreateNewJourneyQuery(selfId, origin.position, destination.position)
+        router.push(`/journey/${journeyId}`).catch((err) => console.error(err))
     }
 
     return (
@@ -62,7 +62,7 @@ const IndexPage = () => {
 
                 <Grid item xs={13} paddingY={2}>
                     <Box display="flex" justifyContent="center" alignItems="center" paddingTop={2}>
-                        <Button variant="contained" color="success" onClick={handleCreateNew}>
+                        <Button variant="contained" color="success" onClick={useHandleCreateNew}>
                             Create New
                         </Button>
                     </Box>
