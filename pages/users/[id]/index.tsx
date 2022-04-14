@@ -25,12 +25,11 @@ const UserProfileBody = ({
     var miniHistories = []
     histories.map((historyId) => {
         const { data: group } = useJourneyGroupQuery(historyId)
-        const from = group?.origin.displayName
-        const to = group?.destination.displayName
+        const host = group?.host
+        const { data: userInfo } = useProfileQuery(host)
         miniHistories.push({
             id: historyId,
-            from: from,
-            to: to
+            host: userInfo.username,
         })
     })
 
@@ -118,7 +117,7 @@ const UserProfileBody = ({
                                         <ListItemAvatar>
                                             <NumbersIcon fontSize="large" color="secondary" />
                                         </ListItemAvatar>
-                                        <ListItemText primary={"From: " + item.from} secondary={"To: " + item.to} />
+                                        <ListItemText primary={"Hosted By: " + item.host} />
                                     </ListItem>
                                 </Link>
                             ))}
