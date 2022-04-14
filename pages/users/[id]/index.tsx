@@ -110,8 +110,6 @@ const UserProfileBody = ({
                                 <ListItemText primary="Total reviews" secondary={reviews.length} />
                             </ListItem>
                         </List>
-
-
                     </Box>
                     <Grid item>
                         <List
