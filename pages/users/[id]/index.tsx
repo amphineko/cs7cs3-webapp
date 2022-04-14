@@ -23,11 +23,13 @@ const UserHistory = ({ id }: { id: string }) => {
     const { data: userInfo } = useProfileQuery(group?.host)
 
     return (
-        <Link href={`/journey/${id}`} passHref>
-            <ListItemAvatar>
-                <NumbersIcon fontSize="large" color="secondary" />
-            </ListItemAvatar>
-            <ListItemText primary={`Hosted By: ${userInfo?.username}`} />
+        <Link href={`/journeys/${id}`} passHref>
+            <Button>
+                <ListItemAvatar>
+                    <NumbersIcon fontSize="large" color="secondary" />
+                </ListItemAvatar>
+                <ListItemText primary={`Hosted By: ${userInfo?.username}`} />
+            </Button>
         </Link>
     )
 }
@@ -109,6 +111,9 @@ const UserProfileBody = ({
                             </ListItem>
                         </List>
 
+
+                    </Box>
+                    <Grid item>
                         <List
                             sx={{
                                 bgcolor: 'background.paper',
@@ -121,7 +126,7 @@ const UserProfileBody = ({
                                 </ListItem>
                             ))}
                         </List>
-                    </Box>
+                    </Grid>
                 </Grid>
             </Grid>
 
